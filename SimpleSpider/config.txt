@@ -15,4 +15,3 @@ engine
 				replace content <p[^<>]+?data-role[^<>]+?>[^<>]+?</p>
 				result title content
 	export-json souhu.json
-	 

@@ -25,7 +25,8 @@ namespace SimpleSpider
                 .Select(t3 => typeof(CommandManage).Assembly.CreateInstance(t3.FullName)).
                 ToList().ForEach(c => CommandManage.Regist((ICommand)c));
 
-            var root = new ConfigParser().Parse(File.ReadAllText(@"..\..\config.txt"));
+            var root = new ConfigParser(CommandManage.Commands.Select(c => c.Key).ToList()).Parse(File.ReadAllText(@"..\..\config.txt"));
+
             bool stop = false;
             Excute(root.Childs, null, null, ref stop);
 
