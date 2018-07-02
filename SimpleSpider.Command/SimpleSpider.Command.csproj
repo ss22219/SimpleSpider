@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8018E5D1-BDFC-47EA-928E-039C185B37C9}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{954E3698-A5C7-4A72-8F02-F8AE65B6C28D}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleSpider</RootNamespace>
-    <AssemblyName>SimpleSpider</AssemblyName>
+    <RootNamespace>SimpleSpider.Command</RootNamespace>
+    <AssemblyName>SimpleSpider.Command</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.8.4.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.8.4\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -47,22 +48,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="CommandManage.cs" />
+    <Compile Include="Commands\DataCommand.cs" />
+    <Compile Include="Commands\ExportJsonCommand.cs" />
+    <Compile Include="Commands\ForeachCommand.cs" />
+    <Compile Include="Commands\HtmlClearCommand.cs" />
+    <Compile Include="Commands\HttperCommand.cs" />
+    <Compile Include="Commands\JsonCommand.cs" />
+    <Compile Include="Commands\ListCommand.cs" />
+    <Compile Include="Commands\RangCommand.cs" />
+    <Compile Include="Commands\RangSelectCommand.cs" />
+    <Compile Include="Commands\SelectCommand.cs" />
+    <Compile Include="Commands\TaskCommand.cs" />
+    <Compile Include="Commands\XPathCommand.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilty.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleSpider.Command\SimpleSpider.Command.csproj">
-      <Project>{954E3698-A5C7-4A72-8F02-F8AE65B6C28D}</Project>
-      <Name>SimpleSpider.Command</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleSpider.Config\SimpleSpider.Config.csproj">
-      <Project>{35728F47-92F4-4122-A519-EFA3C82C6163}</Project>
-      <Name>SimpleSpider.Config</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
