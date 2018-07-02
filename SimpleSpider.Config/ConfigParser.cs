@@ -37,7 +37,7 @@ namespace SimpleSpider.Config
             _commandNames = commandNames;
         }
 
-       public const string ENGINE = "engine";
+        public const string ENGINE = "engine";
         static char[] spaceChar = new char[] { '\r', '\n', '\t', ' ' };
 
         enum LineStatus
@@ -90,19 +90,23 @@ namespace SimpleSpider.Config
                 {
                     if (last.Parent == null)
                         throw new ConfigParseException(lineNum, 0, "不能出现多个根节点");
-                    if (last.Indent != node.Indent)
-                        throw new ConfigParseException(lineNum, 0, "与同级缩进不一致！");
                     last.Parent.Childs.Add(node);
                     node.Parent = last.Parent;
                 }
                 else
                 {
-                    if (last.Parent.Parent == null)
+                    var tmpNode = last;
+                    while (tmpNode.Indent != node.Indent)
+                    {
+                        if (tmpNode.Parent != null)
+                            tmpNode = tmpNode.Parent;
+                        else
+                            throw new ConfigParseException(lineNum, 0, "与同级缩进不一致！");
+                    }
+                    if (tmpNode.Parent == null)
                         throw new ConfigParseException(lineNum, 0, "不能出现多个根节点");
-                    if (last.Parent.Indent != node.Indent)
-                        throw new ConfigParseException(lineNum, 0, "与同级缩进不一致！");
-                    node.Parent = last.Parent.Parent;
-                    last.Parent.Parent.Childs.Add(node);
+                    node.Parent = tmpNode.Parent;
+                    tmpNode.Parent.Childs.Add(node);
                 }
 
                 last = node;

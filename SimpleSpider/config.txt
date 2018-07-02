@@ -12,5 +12,6 @@ engine
 				httper utf8
 				xpath title=//*[@id="article-container"]/div[2]/div[1]/div[1]/h1 content=//*[@id="mp-editor"]=html
 				htmlclear content
-				export-json souhu.json title,content
+				result title content
+	export-json souhu.json
 	 

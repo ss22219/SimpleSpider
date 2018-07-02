@@ -20,17 +20,8 @@ namespace SimpleSpider.Command.Commands
 
         public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
         {
-            if (args.Length > 1)
-            {
-                Dictionary<string, string> edata = new Dictionary<string, string>();
-                var names = args[1].Split(',');
-                foreach (var item in names)
-                {
-                    if (data.ContainsKey(item))
-                        edata[item] = data[item];
-                }
-                File.AppendAllText(args[0], JsonConvert.SerializeObject(edata) + "\r\n");
-            }
+            var filename = args.Length > 0 ? args[0] : DateTime.Now.ToString("yyyy.MM.dd_hh_mm_ss") + ".json";
+            File.WriteAllText(filename, JsonConvert.SerializeObject(ResultCommand.Rows));
             return new CommandResult() { Success = true, Data = data, PeplineOutput = peplineInput };
         }
     }

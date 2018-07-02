@@ -58,6 +58,7 @@
     <Compile Include="Commands\ListCommand.cs" />
     <Compile Include="Commands\RangCommand.cs" />
     <Compile Include="Commands\RangSelectCommand.cs" />
+    <Compile Include="Commands\ResultCommand.cs" />
     <Compile Include="Commands\SelectCommand.cs" />
     <Compile Include="Commands\TaskCommand.cs" />
     <Compile Include="Commands\XPathCommand.cs" />
