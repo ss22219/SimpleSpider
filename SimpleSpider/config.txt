@@ -11,7 +11,8 @@ engine
 				data url
 				httper utf8
 				xpath title=//*[@id="article-container"]/div[2]/div[1]/div[1]/h1 content=//*[@id="mp-editor"]=html
-				htmlclear content
+				htmlclear content img
+				replace content <p[^<>]+?data-role[^<>]+?>[^<>]+?</p>
 				result title content
 	export-json souhu.json
 	 

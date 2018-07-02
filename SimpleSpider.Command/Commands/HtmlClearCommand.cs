@@ -19,12 +19,19 @@ namespace SimpleSpider.Command.Commands
         public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
         {
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            var tags = new List<string>();
 
             if (args.Length > 0)
             {
-                foreach (var item in args)
+                foreach (var item in args[0].Split(','))
                 {
                     doc.LoadHtml(data[item]);
+                    if (args.Length > 1)
+                        foreach (var tag in args[1].Split(','))
+                        {
+                            foreach (var el in doc.DocumentNode.Descendants(tag).ToArray())
+                                el.Remove();
+                        }
                     foreach (var script in doc.DocumentNode.Descendants("script").ToArray())
                         script.Remove();
                     foreach (var style in doc.DocumentNode.Descendants("style").ToArray())
