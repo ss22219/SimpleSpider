@@ -13,7 +13,6 @@ namespace SimpleSpider
 {
     class Program
     {
-        static string errorMsg;
         static Node errorNode;
 
         static void Main(string[] args)
@@ -25,20 +24,25 @@ namespace SimpleSpider
                 .Select(t3 => typeof(CommandManage).Assembly.CreateInstance(t3.FullName)).
                 ToList().ForEach(c => CommandManage.Regist((ICommand)c));
 
-            var root = new ConfigParser(CommandManage.Commands.Select(c => c.Key).ToList()).Parse(File.ReadAllText(@"..\..\config.txt"));
+            ExcuteTask(args[0]);
+        }
 
-            bool stop = false;
-            Excute(root.Childs, null, null, ref stop);
-
-            if (errorMsg != null)
+        static void ExcuteTask(string configFile)
+        {
+            var configFiles = new string[] { configFile };
+            var parser = new ConfigParser(CommandManage.Commands.Select(c => c.Key).ToList());
+            foreach (var config in configFiles)
             {
-                Console.WriteLine("错误：" + errorMsg);
-                Console.WriteLine("Node：" + errorNode.Name + " 配置文件：" + errorNode.Line + "行");
+                errorNode = null;
+                var root = parser.Parse(File.ReadAllText(config));
+                var result = Excute(root.Childs);
+                if (!result.Success)
+                {
+                    Console.WriteLine("错误：" + result.PeplineOutput.ToString());
+                    Console.WriteLine("Node：" + errorNode.Name + " 配置文件：" + config + " " + errorNode.Line + "行");
+                }
             }
-            else
-                Console.WriteLine("采集已经完成");
-
-            Console.ReadKey();
+            Console.WriteLine("采集已经完成");
         }
 
         static void Log(Node node)
@@ -73,7 +77,7 @@ namespace SimpleSpider
             return clone.Count == 0 ? null : clone;
         }
 
-        static void Excute(List<Node> nodes, object pepline, Dictionary<string, string> data, ref bool stop)
+        static CommandResult Excute(List<Node> nodes, object pepline = null, Dictionary<string, string> data = null)
         {
             foreach (var node in nodes)
             {
@@ -81,10 +85,11 @@ namespace SimpleSpider
                 if (!CommandManage.Commands.ContainsKey(node.Name))
                     throw new ConfigParseException(node.Line, node.Indent, $"{node.Name} 命令不存在");
                 var command = CommandManage.Commands[node.Name];
-                var result = command.Excute(pepline, Clone(data), node.Args.ToArray());
+                data = Clone(data);
+                var result = command.Excute(pepline, data, node.Args.ToArray());
 
                 result.Data = GetResultData(data, result.Data);
-                data = Clone(result.Data);
+                data = result.Data;
                 pepline = result.PeplineOutput;
                 if (result.Success)
                 {
@@ -92,19 +97,19 @@ namespace SimpleSpider
                     {
                         foreach (var item in (IEnumerable)result.PeplineOutput)
                         {
-                            Excute(node.Childs, item, Clone(result.Data), ref stop);
+                            result = Excute(node.Childs, item, data);
+                            if (!result.Success)
+                                return result;
                         }
                     }
                 }
                 else
                 {
-                    errorMsg = result.PeplineOutput.ToString();
                     errorNode = node;
-                    stop = true;
+                    return result;
                 }
-                if (stop)
-                    break;
             }
+            return new CommandResult() { Success = true };
         }
     }
 }
