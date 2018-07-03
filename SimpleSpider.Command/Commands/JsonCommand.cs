@@ -29,7 +29,7 @@ namespace SimpleSpider.Command.Commands
             return -1;
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             string content = null;
             if (args.Contains("-from"))
@@ -38,11 +38,11 @@ namespace SimpleSpider.Command.Commands
                 content = data[args[index + 1]];
                 var ls = args.ToList(); ls.RemoveAt(index); ls.RemoveAt(index + 1); args = ls.ToArray();
             }
-            else if (!(peplineInput is JToken))
-                content = peplineInput.ToString();
+            else if (!(pipelineInput is JToken))
+                content = pipelineInput.ToString();
             try
             {
-                var token = content != null ? JsonConvert.DeserializeObject<JToken>(content) : (JToken)peplineInput;
+                var token = content != null ? JsonConvert.DeserializeObject<JToken>(content) : (JToken)pipelineInput;
                 if (args.Length != 0)
                 {
                     foreach (var item in args)
@@ -77,11 +77,11 @@ namespace SimpleSpider.Command.Commands
                     }
                 }
 
-                return new CommandResult() { Success = true, PeplineOutput = token.Type == JTokenType.Array ? (object)token.ToArray() : token, Data = data };
+                return new CommandResult() { Success = true, PipelineOutput = token.Type == JTokenType.Array ? (object)token.ToArray() : token, Data = data };
             }
             catch (Exception ex)
             {
-                return new CommandResult() { Success = false, PeplineOutput = ex.ToString() };
+                return new CommandResult() { Success = false, PipelineOutput = ex.ToString() };
             }
 
         }

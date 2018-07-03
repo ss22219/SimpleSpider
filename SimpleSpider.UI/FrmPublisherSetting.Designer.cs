@@ -69,10 +69,12 @@
             this.Controls.Add(this.txtName);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSave);
+            this.KeyPreview = true;
             this.Name = "FrmPublisherSetting";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.FrmPublisherSetting_Load);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FrmPublisherSetting_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

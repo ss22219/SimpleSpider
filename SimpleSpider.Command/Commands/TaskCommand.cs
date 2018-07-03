@@ -16,10 +16,10 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             data["task"] = args[0];
-            return new CommandResult() { Success = true, Data = data, PeplineOutput = peplineInput };
+            return new CommandResult() { Success = true, Data = data, PipelineOutput = pipelineInput };
         }
     }
 }

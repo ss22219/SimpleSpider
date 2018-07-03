@@ -17,7 +17,7 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             try
             {
@@ -31,12 +31,12 @@ namespace SimpleSpider.Command.Commands
                 {
                     client.Headers[setting.Key] = setting.Value;
                 }
-                var result = client.DownloadString(peplineInput.ToString());
-                return new CommandResult() { Success = true, PeplineOutput = result };
+                var result = client.DownloadString(pipelineInput.ToString());
+                return new CommandResult() { Success = true, PipelineOutput = result };
             }
             catch (Exception ex)
             {
-                return new CommandResult() { Success = false, PeplineOutput = ex.ToString() };
+                return new CommandResult() { Success = false, PipelineOutput = ex.ToString() };
             }
         }
     }

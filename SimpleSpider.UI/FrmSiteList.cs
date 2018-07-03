@@ -27,7 +27,12 @@ namespace SimpleSpider.UI
         void Edit(Publisher publisher)
         {
             var frm = new FrmPublisherSetting(publisher);
-            frm.ShowDialog();
+            frm.Show();
+            frm.FormClosing += FrmPublish_FormClosing;
+        }
+
+        private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
+        {
             Bind();
             UserConfig.Save();
         }
@@ -40,7 +45,13 @@ namespace SimpleSpider.UI
         private void 添加RToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var frm = new FrmCreateSiteSetting();
-            frm.ShowDialog();
+            frm.Show();
+            frm.FormClosing += FrmCreateSite_FormClosing;
+        }
+
+        private void FrmCreateSite_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var frm = (FrmCreateSiteSetting)sender;
             if (frm.Publisher != null)
             {
                 UserConfig.Publishers.Add(frm.Publisher);
@@ -64,6 +75,10 @@ namespace SimpleSpider.UI
         private void FrmSiteList_Load(object sender, EventArgs e)
         {
             dataGridView1.AutoGenerateColumns = false;
+
+            //禁止用户改变DataGridView1所有行的行高
+            dataGridView1.AllowUserToResizeColumns = false;
+            dataGridView1.AllowUserToResizeRows = false;
             Bind();
         }
 

@@ -17,7 +17,7 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             var names = args[0].Split(',');
             var rule = args[1];
@@ -30,7 +30,7 @@ namespace SimpleSpider.Command.Commands
                     i++;
                 }
             }
-            return new CommandResult() { Success = true, Data = data, PeplineOutput = peplineInput };
+            return new CommandResult() { Success = true, Data = data, PipelineOutput = pipelineInput };
         }
     }
 }

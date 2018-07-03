@@ -29,15 +29,18 @@ namespace SimpleSpider.UI
         public FrmDataManage()
         {
             InitializeComponent();
+            //禁止用户改变DataGridView1所有行的行高
+            dataGridView1.AllowUserToResizeColumns = false;
+            dataGridView1.AllowUserToResizeRows = false;
         }
 
-        void Bind()
+        public void Bind()
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                var filter = string.IsNullOrEmpty(comboBox1.SelectedText) ? null : " and tag='" + comboBox1.SelectedText + "'";
-                dataGridView1.DataSource = connection.Query<ArticleInfo>($"select top {numericUpDown1.Value} * from [{tableName}] where publish = 0 {filter}");
+                var filter = string.IsNullOrEmpty(comboBox1.Text) ? null : " and tag='" + comboBox1.Text + "'";
+                dataGridView1.DataSource = connection.Query<ArticleInfo>($"select top {numericUpDown1.Value} * from [{tableName}] where publish = 0 {filter} order by id desc");
                 if (comboBox1.Items.Count == 0)
                 {
                     var tags = connection.Query<string>($"select top {numericUpDown1.Value} tag from [{tableName}] where publish = 0 group by tag").ToList();
@@ -72,8 +75,14 @@ namespace SimpleSpider.UI
                 var article = (ArticleInfo)row.DataBoundItem;
                 data.Add(article);
             }
-            var frm = new FrmPublish(data) { Width = Width};
-            frm.ShowDialog();
+            var frm = new FrmPublish(data) { Width = Width };
+            frm.Show();
+            frm.FormClosing += Frm_FormClosing;
+        }
+
+        private void Frm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var frm = (FrmPublish)sender;
             if (frm.PublishedData.Count > 0)
                 using (var connection = new SqlConnection(connectionString))
                 {
@@ -85,6 +94,21 @@ namespace SimpleSpider.UI
                     connection.Execute($"update {tableName} set publish=1 where id in ({ids.TrimEnd(',')})");
                 }
             Bind();
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+            {
+                var article = (ArticleInfo)row.DataBoundItem;
+                new FrmShowLog(article.content).Show();
+                break;
+            }
+        }
+
+        private void 发布ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            button1_Click(null, null);
         }
     }
 }

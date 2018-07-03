@@ -39,7 +39,7 @@ namespace SimpleSpider.UI
                     textbox.TextChanged += Textbox_TextChanged;
                     this.Controls.Add(textbox);
                     var button = new Button() { Text = "获取", Name = "btn" + option.Name, Top = top - 1, Left = 270, Width = 50 };
-                    button.Click += Button_Click;
+                    button.Click += LoginButton_Click;
                     this.Controls.Add(button);
                 }
                 else if (option.OptionInputType == OptionInputType.Select)
@@ -67,14 +67,25 @@ namespace SimpleSpider.UI
             this.Width = 400;
         }
 
-        private void Button_Click(object sender, EventArgs e)
+        private void LoginButton_Click(object sender, EventArgs e)
         {
             var name = ((Button)sender).Name.Replace("btn", "");
-            var frm = new FrmLogin(ReplaceParam(GetOption(name).SelectValues[0].Value));
-            frm.ShowDialog();
+            var frm = new FrmLogin(ReplaceParam(GetOption(name).SelectValues[0].Value)) { Cookie = this.Controls[name].Text, Text = name };
+            frm.Show();
+            frm.FormClosing += FrmLogin_FormClosing;
+        }
+
+        private void FrmLogin_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var frm = (FrmLogin)sender;
+            var name = frm.Text;
             if (!string.IsNullOrEmpty(frm.Cookie))
             {
                 this.Controls[name].Text = frm.Cookie;
+            }
+            if (!string.IsNullOrEmpty(frm.Encoding))
+            {
+                this.Controls["Encoding"].Text = frm.Encoding;
             }
         }
 
@@ -112,6 +123,7 @@ namespace SimpleSpider.UI
         private void Combox_Click(object sender, EventArgs e)
         {
             var box = (ComboBox)sender;
+            var val = box.Text;
             if (box.DataSource == null)
             {
                 var option = Publisher.Options.Where(o => o.Name == box.Name).FirstOrDefault();
@@ -139,6 +151,8 @@ namespace SimpleSpider.UI
                     selectValues.Add(new KeyValuePair<string, string>(item.Groups["Name"].Value, item.Groups["Value"].Value));
                 }
                 box.DataSource = selectValues;
+                if (!string.IsNullOrEmpty(val))
+                    box.SelectedValue = val;
             }
         }
 
@@ -169,6 +183,12 @@ namespace SimpleSpider.UI
         private void txtName_TextChanged(object sender, EventArgs e)
         {
             Publisher.Name = txtName.Text;
+        }
+
+        private void FrmPublisherSetting_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\r')
+                btnSave_Click(null, null);
         }
     }
 }

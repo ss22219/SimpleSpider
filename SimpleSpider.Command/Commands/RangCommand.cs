@@ -12,11 +12,11 @@ namespace SimpleSpider.Command.Commands
         {
             get
             {
-                return "rang";
+                return "range";
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             var start = int.Parse(args[0]);
             var end = int.Parse(args[1]);
@@ -25,7 +25,7 @@ namespace SimpleSpider.Command.Commands
             {
                 list.Add(i);
             }
-            return new CommandResult() { Success = true, PeplineOutput = list };
+            return new CommandResult() { Success = true, PipelineOutput = list };
         }
     }
 }

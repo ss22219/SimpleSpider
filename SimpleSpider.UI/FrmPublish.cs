@@ -54,6 +54,8 @@ namespace SimpleSpider.UI
                     SetProcess(i);
                 }
             }
+            Log("发布结束");
+            Close();
         }
 
         private void SetProcess(int count)
@@ -70,7 +72,13 @@ namespace SimpleSpider.UI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            new FrmSiteList().ShowDialog();
+            var frm = new FrmSiteList();
+            frm.Show();
+            frm.FormClosing += Frm_FormClosing;
+        }
+
+        private void Frm_FormClosing(object sender, FormClosingEventArgs e)
+        {
             comboBox1.DataSource = UserConfig.Publishers.ToArray();
         }
 

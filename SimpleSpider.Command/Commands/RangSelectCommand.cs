@@ -13,16 +13,16 @@ namespace SimpleSpider.Command.Commands
         {
             get
             {
-                return "rang-select";
+                return "range-select";
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             List<string> list = new List<string>();
             var start = int.Parse(args[0]);
             var end = int.Parse(args[1]);
-            IEnumerable e = peplineInput is IEnumerable ? (IEnumerable)peplineInput:  new List<string>() { peplineInput.ToString() }; 
+            IEnumerable e = pipelineInput is IEnumerable ? (IEnumerable)pipelineInput:  new List<string>() { pipelineInput.ToString() }; 
             foreach (var item in e)
             {
                 for (int i = start; i <= end; i++)
@@ -30,7 +30,7 @@ namespace SimpleSpider.Command.Commands
                     list.Add(args[2].Replace("{$0}", item.ToString()).Replace("{$1}", i.ToString()));
                 }
             }
-            return new CommandResult() { Success = true, PeplineOutput = list };
+            return new CommandResult() { Success = true, PipelineOutput = list };
         }
     }
 }

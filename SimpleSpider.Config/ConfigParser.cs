@@ -38,6 +38,7 @@ namespace SimpleSpider.Config
         }
 
         public const string ENGINE = "engine";
+        public const char COMMENT_CAHR = '#';
         static char[] spaceChar = new char[] { '\r', '\n', '\t', ' ' };
 
         enum LineStatus
@@ -78,7 +79,11 @@ namespace SimpleSpider.Config
                     node = new Node();
                 else
                     continue;
+
                 NodeParse(line, lineNum, node);
+                if (node.Name == null)
+                    continue;
+
                 if (_commandNames != null && !_commandNames.Contains(node.Name))
                     throw new ConfigParseException(lineNum, node.Indent, $"{node.Name} 命令不存在！");
                 if (node.Indent > last.Indent)
@@ -128,8 +133,8 @@ namespace SimpleSpider.Config
             node.Line = line;
             NodeParseStatus status = NodeParseStatus.Indent;
             int indent = 0;
-            string name = "";
-            string argument = "";
+            string name = null;
+            string argument = null;
 
             bool converChar = false;
             List<string> args = new List<string>();
@@ -172,6 +177,10 @@ namespace SimpleSpider.Config
                     converChar = false;
                     if (content[word] == '\\')
                         converChar = true;
+
+                    if (content[word] == COMMENT_CAHR)
+                        goto End;
+
                     switch (status)
                     {
                         case NodeParseStatus.Indent:
@@ -195,6 +204,8 @@ namespace SimpleSpider.Config
                     }
                 }
             }
+
+            End:
             if (!string.IsNullOrEmpty(argument))
                 args.Add(argument);
             if (!string.IsNullOrEmpty(name))

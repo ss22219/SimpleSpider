@@ -17,16 +17,16 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             if (args.Length == 0)
-                return new CommandResult() { Success = true, PeplineOutput = HttpUtility.HtmlDecode(peplineInput.ToString()) };
+                return new CommandResult() { Success = true, PipelineOutput = HttpUtility.HtmlDecode(pipelineInput.ToString()) };
             foreach (var item in args)
             {
                 if (data.ContainsKey(item))
                     data[item] = HttpUtility.HtmlDecode(data[item]);
             }
-            return new CommandResult() { Success = true, PeplineOutput = peplineInput, Data = data };
+            return new CommandResult() { Success = true, PipelineOutput = pipelineInput, Data = data };
         }
     }
 }

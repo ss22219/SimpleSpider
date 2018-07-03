@@ -16,9 +16,9 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
-            return new CommandResult() { Success = true, PeplineOutput = args };
+            return new CommandResult() { Success = true, PipelineOutput = args };
         }
     }
 }

@@ -88,10 +88,12 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
+            this.KeyPreview = true;
             this.Name = "FrmCreateSiteSetting";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "添加发布站点";
             this.Load += new System.EventHandler(this.FrmCreateSiteSetting_Load);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FrmCreateSiteSetting_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

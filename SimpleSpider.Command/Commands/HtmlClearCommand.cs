@@ -16,7 +16,7 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             var tags = new List<string>();
@@ -41,7 +41,7 @@ namespace SimpleSpider.Command.Commands
                     data[item] = doc.DocumentNode.OuterHtml;
                 }
             }
-            return new CommandResult() { Success = true, Data = data, PeplineOutput = peplineInput };
+            return new CommandResult() { Success = true, Data = data, PipelineOutput = pipelineInput };
         }
     }
 }

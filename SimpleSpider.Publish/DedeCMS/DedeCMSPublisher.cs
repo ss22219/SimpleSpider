@@ -47,7 +47,7 @@ namespace SimpleSpider.Publish.DedeCMS
                     new KeyValuePair<string, string>("Url", "{SiteUrl}")
                 } },
                 new  Option() {Name= "TypeId", DisplayName = "栏目ID", OptionInputType= OptionInputType.RemoteMatch, SelectValues =new List<KeyValuePair<string, string>>() {
-                    new KeyValuePair<string, string>("{SiteUrl}/makehtml_list.php", @"<option value='(?<Value>\d+)'>─(?<Name>\w+)</option>"),
+                    new KeyValuePair<string, string>("{SiteUrl}/makehtml_list.php", @"<option value='(?<Value>\d+)'>(?<Name>[^<>]+)</option>"),
                 }}
             };
         }
@@ -86,7 +86,7 @@ namespace SimpleSpider.Publish.DedeCMS
 
             HttpClientHandler httpClientHandler = new HttpClientHandler()
             {
-                AllowAutoRedirect = false,
+                AllowAutoRedirect = true,
                 UseCookies = false
             };
             var client = new HttpClient(httpClientHandler);

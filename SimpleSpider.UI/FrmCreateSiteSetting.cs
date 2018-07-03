@@ -42,5 +42,11 @@ namespace SimpleSpider.UI
         {
             comboBox1.DataSource = UserConfig.PublisherTypes.Select(p => p.Key).ToList();
         }
+
+        private void FrmCreateSiteSetting_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\r')
+                button1_Click(null, null);
+        }
     }
 }

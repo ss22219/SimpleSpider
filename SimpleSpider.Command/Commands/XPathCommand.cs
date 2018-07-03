@@ -48,10 +48,10 @@ namespace SimpleSpider.Command.Commands
         }
 
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
             var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(peplineInput.ToString());
+            htmlDoc.LoadHtml(pipelineInput.ToString());
             foreach (var item in args)
             {
                 if (!item.StartsWith("/"))
@@ -60,16 +60,16 @@ namespace SimpleSpider.Command.Commands
                     var name = set[0];
                     var node = htmlDoc.DocumentNode.SelectSingleNode(getRule(item));
                     if (node == null)
-                        return new CommandResult() { Success = false, PeplineOutput = set[1] + " 获取失败" };
+                        return new CommandResult() { Success = false, PipelineOutput = set[1] + " 获取失败" };
                     data[name] = getVal(set, node);
                 }
                 else if (args.Length == 1)
                 {
                     var node = htmlDoc.DocumentNode.SelectSingleNode(getRule(item));
-                    peplineInput = getVal(args, node);
+                    pipelineInput = getVal(args, node);
                 }
             }
-            return new CommandResult() { Success = true, Data = data, PeplineOutput = peplineInput };
+            return new CommandResult() { Success = true, Data = data, PipelineOutput = pipelineInput };
         }
     }
 }

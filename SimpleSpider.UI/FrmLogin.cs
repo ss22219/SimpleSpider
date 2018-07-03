@@ -14,20 +14,23 @@ namespace SimpleSpider.UI
     {
         public FrmLogin(string url)
         {
+            this.url = url;
             InitializeComponent();
-            this.webBrowser1.Url = new Uri(url);
         }
 
+        string url { get; set; }
         public string Cookie { get; set; }
+        public string Encoding { get; set; }
 
         private void FrmLogin_Load(object sender, EventArgs e)
         {
-
+            this.webBrowser1.Url = new Uri(url);
         }
 
         private void FrmLogin_FormClosing(object sender, FormClosingEventArgs e)
         {
             Cookie = webBrowser1.Document.Cookie;
+            Encoding = webBrowser1.Document.Encoding;
         }
     }
 }

@@ -19,12 +19,12 @@ namespace SimpleSpider.UI
 
         private void button2_Click(object sender, EventArgs e)
         {
-            new FrmSiteList().ShowDialog();
+            new FrmSiteList().Show();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            new FrmDataManage().ShowDialog();
+            new FrmDataManage().Show();
         }
     }
 }

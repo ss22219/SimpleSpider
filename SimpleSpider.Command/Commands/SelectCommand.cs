@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SimpleSpider.Command.Commands
@@ -17,17 +18,36 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        public CommandResult Excute(object peplineInput, Dictionary<string, string> data, string[] args)
+        public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
-            List<string> ls = new List<string>();
-            foreach (var item in (IEnumerable)peplineInput)
+            if (pipelineInput is IEnumerable)
             {
-                foreach (var arg in args)
+                List<string> ls = new List<string>();
+                foreach (var item in (IEnumerable)pipelineInput)
                 {
-                    ls.Add(arg.Replace("{$0}", item.ToString()));
+                    foreach (var arg in args)
+                    {
+                        string str = arg;
+                        foreach (Match match in new Regex(@"\{([$\w]+)\}").Matches(str))
+                        {
+                            var name = match.Groups[1].Value;
+                            var value = "";
+                            if (data.ContainsKey(name))
+                                value = data[name];
+                            else if (name == "$0")
+                                value = item.ToString();
+
+                            str = str.Replace(match.Groups[0].Value, value);
+                        }
+                        ls.Add(str);
+                    }
                 }
+                return new CommandResult() { Success = true, PipelineOutput = ls };
             }
-            return new CommandResult() { Success = true, PeplineOutput = ls };
+            else
+            {
+                return new CommandResult() { Success = false, PipelineOutput = "不支持foreach后操作！" };
+            }
         }
     }
 }
