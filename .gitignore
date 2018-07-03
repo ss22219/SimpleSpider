@@ -240,3 +240,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+SimpleSpider.UI/App.config
+*.exe.config

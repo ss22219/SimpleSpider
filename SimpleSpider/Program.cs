@@ -34,13 +34,20 @@ namespace SimpleSpider
             foreach (var config in configFiles)
             {
                 errorNode = null;
-                var root = parser.Parse(File.ReadAllText(config));
-                var result = Excute(root.Childs);
-                if (!result.Success)
+                try
                 {
-                    Console.WriteLine($"错误：{result.PipelineOutput.ToString()}");
-                    Console.WriteLine($"Command：{errorNode.Name}, 配置文件：{config} 行{errorNode.Line}");
-                    Console.ReadKey();
+                    var root = parser.Parse(File.ReadAllText(config));
+                    var result = Excute(root.Childs);
+                    if (!result.Success)
+                    {
+                        Console.WriteLine($"错误：{result.PipelineOutput.ToString()}");
+                        Console.WriteLine($"Command：{errorNode.Name}, 配置文件：{config} 行{errorNode.Line}");
+                    }
+                }
+                catch (ConfigParseException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    return;
                 }
             }
         }

@@ -33,8 +33,12 @@ namespace SimpleSpider.UI
 
         private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Bind();
-            UserConfig.Save();
+            var frm = (FrmPublisherSetting)sender;
+            if (frm.Publisher != null)
+            {
+                Bind();
+                UserConfig.Save();
+            }
         }
 
         void Bind()

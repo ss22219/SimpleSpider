@@ -1,4 +1,5 @@
-﻿using SimpleSpider.Publish;
+﻿using Newtonsoft.Json;
+using SimpleSpider.Publish;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +16,23 @@ namespace SimpleSpider.UI
 {
     public partial class FrmPublisherSetting : Form
     {
+        Publisher publisher;
+        Publisher publisherBack;
         public Publisher Publisher;
+
         public FrmPublisherSetting(Publisher publisher)
         {
             InitializeComponent();
             this.Text = publisher.PublisherName + " - " + publisher.Name + " 发布配置";
             int row = 0;
-            this.Publisher = publisher;
-            foreach (var option in publisher.Options)
+
+            var newPublisher = UserConfig.CreatePublisher(publisher.PublisherName);
+            newPublisher.Name = publisher.Name;
+            newPublisher.Options = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(publisher.Options));
+            this.publisher = newPublisher;
+            this.publisherBack = publisher;
+
+            foreach (var option in this.publisher.Options)
             {
                 var top = 35 + (row * 30);
                 var label = new Label() { Text = option.DisplayName, Top = top, Left = 0 };
@@ -85,7 +95,8 @@ namespace SimpleSpider.UI
             }
             if (!string.IsNullOrEmpty(frm.Encoding))
             {
-                this.Controls["Encoding"].Text = frm.Encoding;
+                if (this.Controls.ContainsKey("Encoding"))
+                    this.Controls["Encoding"].Text = frm.Encoding;
             }
         }
 
@@ -107,7 +118,7 @@ namespace SimpleSpider.UI
         {
             if (express == null)
                 return string.Empty;
-            foreach (var item in Publisher.Options)
+            foreach (var item in publisher.Options)
             {
                 if (express.IndexOf("{" + item.Name + "}") != -1)
                     express = express.Replace("{" + item.Name + "}", item.Value);
@@ -117,7 +128,7 @@ namespace SimpleSpider.UI
 
         private Option GetOption(string name)
         {
-            return Publisher.Options.Where(p => p.Name == name).FirstOrDefault();
+            return publisher.Options.Where(p => p.Name == name).FirstOrDefault();
         }
 
         private void Combox_Click(object sender, EventArgs e)
@@ -126,7 +137,7 @@ namespace SimpleSpider.UI
             var val = box.Text;
             if (box.DataSource == null)
             {
-                var option = Publisher.Options.Where(o => o.Name == box.Name).FirstOrDefault();
+                var option = publisher.Options.Where(o => o.Name == box.Name).FirstOrDefault();
                 var url = ReplaceParam(option.SelectValues[0].Key);
                 var regexRule = option.SelectValues[0].Value;
                 if (!url.StartsWith("http"))
@@ -158,8 +169,8 @@ namespace SimpleSpider.UI
 
         private void FrmPublisherSetting_Load(object sender, EventArgs e)
         {
-            txtName.Text = Publisher.Name;
-            foreach (var option in Publisher.Options)
+            txtName.Text = publisher.Name;
+            foreach (var option in publisher.Options)
             {
                 this.Controls[option.Name].Text = option.Value;
             }
@@ -169,7 +180,7 @@ namespace SimpleSpider.UI
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            foreach (var option in Publisher.Options)
+            foreach (var option in publisher.Options)
             {
                 if (string.IsNullOrEmpty(option.Value))
                 {
@@ -177,18 +188,24 @@ namespace SimpleSpider.UI
                     return;
                 }
             }
+
+            publisherBack.Options = publisher.Options;
+            publisherBack.Name = publisher.Name;
+            Publisher = publisherBack;
             Close();
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
         {
-            Publisher.Name = txtName.Text;
+            publisher.Name = txtName.Text;
         }
 
         private void FrmPublisherSetting_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
                 btnSave_Click(null, null);
+            else if (e.KeyChar == '\u001b')
+                Close();
         }
     }
 }
