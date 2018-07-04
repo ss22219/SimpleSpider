@@ -14,8 +14,11 @@
 			data url
 			httper utf-8
 			xpath title=/html/head/meta[8]=attr[content] content=//*[@id="mp-editor"]=html
-			htmlclear content img
+			#image-download content
+			htmlclear content
 			htmldecode title
 			replace content <p[^<>]+?data-role[^<>]+?>.+?</p>
 			result source title content tag
-	export-sqlserver server=.;Integrated\ Security=True;database=spider article
+		break
+	break
+	#export-sqlserver server=.;Integrated\ Security=True;database=spider article
