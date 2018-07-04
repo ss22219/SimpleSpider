@@ -242,3 +242,6 @@ ModelManifest.xml
 .fake/
 SimpleSpider.UI/App.config
 *.exe.config
+SimpleSpider/App.config
+App.config
+/SimpleSpider.zip

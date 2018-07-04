@@ -102,6 +102,7 @@ namespace SimpleSpider.Publish.DedeCMS
                 new KeyValuePair<string, string>("body", data["content"]),
                 new KeyValuePair<string, string>("channelid","1"),
                 new KeyValuePair<string, string>("dopost","save"),
+                new KeyValuePair<string, string>("writer","网络"),
                 new KeyValuePair<string, string>("pubdate", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")),
                 new KeyValuePair<string, string>("imageField.x", "10"),
                 new KeyValuePair<string, string>("imageField.y", "12"),

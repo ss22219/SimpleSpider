@@ -36,7 +36,7 @@ namespace SimpleSpider.Publish
         protected List<string> GetImages(string content)
         {
             var list = new List<string>();
-            foreach (Match item in new Regex(@"<img\s+!data-append[^<>]+?src=['""]?([^'""<>]+)['""]?[^<>]+?>", RegexOptions.IgnoreCase | RegexOptions.Multiline).Matches(content))
+            foreach (Match item in new Regex(@"<img\s+[^<>]*?src=['""]?([^'""<>]+)['""]?[^<>]*?>", RegexOptions.IgnoreCase | RegexOptions.Multiline).Matches(content))
             {
                 if (item.Groups[0].Value.IndexOf("data-append") == -1)
                     list.Add(item.Groups[1].Value);

@@ -7,8 +7,10 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows.Forms;
 using Unreal.QCloud.Api;
 using static SimpleSpider.UI.FrmDataManage;
@@ -37,17 +39,41 @@ namespace SimpleSpider.UI
             {
             }
         }
+        
 
         private async void btnPublish_Click(object sender, EventArgs e)
         {
+
             button2.Enabled = false;
             var publisher = (Publisher)comboBox1.SelectedItem;
             int i = 0;
             foreach (var item in Data)
             {
+                var content = item.content;
+                var title = item.title;
+                if (cbReplaceWord.Checked)
+                {
+                    var wordserverUrl = ConfigurationManager.AppSettings["wordserver_url"];
+                    try
+                    {
+                        var data = new System.Collections.Specialized.NameValueCollection();
+                        data["content"] = content;
+                        content = Encoding.UTF8.GetString(new WebClient().UploadValues(wordserverUrl, data));
+
+                        data = new System.Collections.Specialized.NameValueCollection();
+                        data["content"] = title;
+                        title = Encoding.UTF8.GetString(new WebClient().UploadValues(wordserverUrl, data));
+                    }
+                    catch (Exception)
+                    {
+                        Log("连接伪原创服务器失败！");
+                        return;
+                    }
+                }
+
                 var result = await publisher.Publish(new Dictionary<string, string>() {
-                    {"title",item.title },
-                    {"content",item.content + txtAppend.Text }
+                    {"title",title },
+                    {"content",content + txtAppend.Text }
                 });
                 Log(result.Message);
                 if (!result.Success)
@@ -80,6 +106,11 @@ namespace SimpleSpider.UI
 
         private void FrmPublish_Load(object sender, EventArgs e)
         {
+            if (ConfigurationManager.AppSettings["wordserver_url"] != null)
+            {
+                cbReplaceWord.Visible = true;
+                cbReplaceWord.Checked = true;
+            }
             SetProcess(0);
             comboBox1.DisplayMember = "Name";
             comboBox1.DataSource = UserConfig.Publishers.ToArray();

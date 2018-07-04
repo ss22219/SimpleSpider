@@ -37,7 +37,8 @@ namespace SimpleSpider
                 try
                 {
                     var root = parser.Parse(File.ReadAllText(config));
-                    var result = Excute(root.Childs);
+                    var br = false;
+                    var result = Excute(root, ref br);
                     if (!result.Success)
                     {
                         Console.WriteLine($"错误：{result.PipelineOutput.ToString()}");
@@ -52,9 +53,14 @@ namespace SimpleSpider
             }
         }
 
-        static void Log(Node node, CommandResult result)
+        static void Log(Node node)
         {
             Console.WriteLine($"{new string('-', node.Indent * 4)} {node.Name} {(node.Args.Count > 0 ? node.Args.Aggregate((a, b) => a + " " + b) : null)}");
+        }
+
+        static void Log(Node node, CommandResult result)
+        {
+
             if (result.PipelineOutput != null)
                 Console.WriteLine($"{new string('-', node.Indent * 4)}> {result.PipelineOutput}");
         }
@@ -86,39 +92,60 @@ namespace SimpleSpider
             return clone.Count == 0 ? null : clone;
         }
 
-        static CommandResult Excute(List<Node> nodes, object pipeline = null, Dictionary<string, string> data = null)
+        static CommandResult ExcuteChild(List<Node> childs, IEnumerable list, Dictionary<string, string> data)
         {
-            foreach (var node in nodes)
+            foreach (var item in list)
             {
-                if (!CommandManage.Commands.ContainsKey(node.Name))
-                    throw new ConfigParseException(node.Line, node.Indent, $"{node.Name} 命令不存在");
-                var command = CommandManage.Commands[node.Name];
-                data = Clone(data);
-                var result = command.Excute(pipeline, data, node.Args.ToArray());
+                bool @break = false;
+                var pipeline = item;
+                foreach (var child in childs)
+                {
+                    var result = Excute(child, ref @break, pipeline, data);
+                    pipeline = result.PipelineOutput;
+                    data = result.Data;
 
-                Log(node, result);
-                result.Data = GetResultData(data, result.Data);
-                data = result.Data;
-                pipeline = result.PipelineOutput;
-                if (result.Success)
-                {
-                    if (node.Childs.Count != 0)
+                    if (!result.Success)
+                        return result;
+
+                    if (@break)
                     {
-                        foreach (var item in (IEnumerable)result.PipelineOutput)
-                        {
-                            result = Excute(node.Childs, item, data);
-                            if (!result.Success)
-                                return result;
-                        }
+                        @break = false;
+                        return result;
                     }
-                }
-                else
-                {
-                    errorNode = node;
-                    return result;
                 }
             }
             return new CommandResult() { Success = true };
+        }
+
+        static CommandResult Excute(Node node, ref bool @break, object pipeline = null, Dictionary<string, string> data = null)
+        {
+            if (!CommandManage.Commands.ContainsKey(node.Name))
+                throw new ConfigParseException(node.Line, node.Indent, $"{node.Name} 命令不存在");
+            var command = CommandManage.Commands[node.Name];
+
+            data = Clone(data);
+
+            Log(node);
+            var result = command.Excute(pipeline, data, node.Args.ToArray());
+            Log(node, result);
+
+            result.Data = GetResultData(data, result.Data);
+            data = result.Data;
+            pipeline = result.PipelineOutput;
+
+            if (node.Name == "break")
+            {
+                @break = true;
+                return result;
+            }
+
+            if (result.Success)
+                if (node.Childs.Count != 0)
+                    ExcuteChild(node.Childs, (IEnumerable)pipeline, data);
+                else
+                    errorNode = node;
+
+            return result;
         }
     }
 }

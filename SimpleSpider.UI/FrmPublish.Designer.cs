@@ -36,11 +36,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.txtAppend = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtAppend = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.cbReplaceWord = new System.Windows.Forms.CheckBox();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -120,6 +121,7 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.cbReplaceWord);
             this.groupBox2.Controls.Add(this.button3);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
@@ -131,22 +133,15 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "附加内容";
             // 
-            // txtAppend
+            // button3
             // 
-            this.txtAppend.Location = new System.Drawing.Point(72, 66);
-            this.txtAppend.Multiline = true;
-            this.txtAppend.Name = "txtAppend";
-            this.txtAppend.Size = new System.Drawing.Size(820, 87);
-            this.txtAppend.TabIndex = 0;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 12);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "添加内容";
+            this.button3.Location = new System.Drawing.Point(73, 24);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 2;
+            this.button3.Text = "上传图片";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label4
             // 
@@ -157,15 +152,33 @@
             this.label4.TabIndex = 1;
             this.label4.Text = "附加图片";
             // 
-            // button3
+            // label3
             // 
-            this.button3.Location = new System.Drawing.Point(73, 24);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "上传图片";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(13, 69);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(53, 12);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "添加内容";
+            // 
+            // txtAppend
+            // 
+            this.txtAppend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAppend.Location = new System.Drawing.Point(72, 66);
+            this.txtAppend.Multiline = true;
+            this.txtAppend.Name = "txtAppend";
+            this.txtAppend.Size = new System.Drawing.Size(820, 87);
+            this.txtAppend.TabIndex = 0;
+            // 
+            // cbReplaceWord
+            // 
+            this.cbReplaceWord.AutoSize = true;
+            this.cbReplaceWord.Location = new System.Drawing.Point(168, 28);
+            this.cbReplaceWord.Name = "cbReplaceWord";
+            this.cbReplaceWord.Size = new System.Drawing.Size(60, 16);
+            this.cbReplaceWord.TabIndex = 3;
+            this.cbReplaceWord.Text = "伪原创";
+            this.cbReplaceWord.UseVisualStyleBackColor = true;
             // 
             // FrmPublish
             // 
@@ -207,5 +220,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtAppend;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.CheckBox cbReplaceWord;
     }
 }

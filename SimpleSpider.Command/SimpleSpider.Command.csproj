@@ -47,6 +47,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -55,9 +56,15 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unreal.QCloud, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unreal.QCloud.1.0.2\lib\net45\Unreal.QCloud.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandManage.cs" />
+    <Compile Include="Commands\EngineCommand.cs" />
+    <Compile Include="Commands\BreakCommand.cs" />
     <Compile Include="Commands\DataCommand.cs" />
     <Compile Include="Commands\ExportJsonCommand.cs" />
     <Compile Include="Commands\ExportSqlServerCommand.cs" />
@@ -65,6 +72,7 @@
     <Compile Include="Commands\HtmlClearCommand.cs" />
     <Compile Include="Commands\HtmlDecodeCommand.cs" />
     <Compile Include="Commands\HttperCommand.cs" />
+    <Compile Include="Commands\ImageDownloadCommand.cs" />
     <Compile Include="Commands\JsonCommand.cs" />
     <Compile Include="Commands\ListCommand.cs" />
     <Compile Include="Commands\RangCommand.cs" />
