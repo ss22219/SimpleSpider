@@ -10,6 +10,8 @@ namespace SimpleSpider.Publish
     {
         Text,
         Select,
+        CheckBox,
+        File,
         Cookie,
         RemoteMatch
     }

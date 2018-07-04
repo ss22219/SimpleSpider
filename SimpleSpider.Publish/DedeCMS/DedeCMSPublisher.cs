@@ -12,6 +12,7 @@ namespace SimpleSpider.Publish.DedeCMS
     public class DedeCMSPublisher : Publisher
     {
         List<Option> _options;
+        List<Option> _articalOptions;
 
         public override List<Option> Options
         {
@@ -33,6 +34,36 @@ namespace SimpleSpider.Publish.DedeCMS
             {
                 return "DedeCMS";
             }
+        }
+
+        public override List<Option> ArticalOptions
+        {
+            get
+            {
+                if (_articalOptions == null)
+                    initializationArticalOptions();
+                return _articalOptions;
+            }
+
+            set
+            {
+                _articalOptions = value;
+            }
+        }
+
+        private void initializationArticalOptions()
+        {
+            _articalOptions = new List<Option>() {
+                new Option() { Name = "FlagH", DisplayName="头条", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagC", DisplayName="推荐", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagF", DisplayName="幻灯", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagA", DisplayName="特荐", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagS", DisplayName="滚动", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagB", DisplayName="加粗", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagP", DisplayName="图片", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "FlagI", DisplayName="首页幻灯", OptionInputType= OptionInputType.CheckBox},
+                new Option() { Name = "AutolitPic", DisplayName="提取第一个图片为缩略图", OptionInputType= OptionInputType.CheckBox},
+            new Option() { Name = "Weight", DisplayName = "权重", Value="1000", OptionInputType= OptionInputType.Text}};
         }
 
         private void initializationOptions()
@@ -74,14 +105,27 @@ namespace SimpleSpider.Publish.DedeCMS
                 new KeyValuePair<string, string>("pubdate", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")),
                 new KeyValuePair<string, string>("imageField.x", "10"),
                 new KeyValuePair<string, string>("imageField.y", "12"),
-                new KeyValuePair<string, string>("remote", "1"),
+                //new KeyValuePair<string, string>("remote", "1"),
+                //new KeyValuePair<string, string>("autolitpic", "1"),
                 new KeyValuePair<string, string>("dellink", "1"),
-                new KeyValuePair<string, string>("autolitpic", "1"),
                 new KeyValuePair<string, string>("needwatermark", "1"),
                 new KeyValuePair<string, string>("sptype", "hand"),
                 new KeyValuePair<string, string>("notpost", "0"),
                 new KeyValuePair<string, string>("click", new Random().Next(100,999).ToString()),
             };
+            var images = GetImages(data["title"]);
+            foreach (var item in ArticalOptions)
+            {
+                if (item.Name.StartsWith("Flag") && item.Value == "True")
+                {
+                    if (item.Name == "AutolitPic" && images.Any())
+                        list.Add(new KeyValuePair<string, string>("picname", images.FirstOrDefault()));
+                    list.Add(new KeyValuePair<string, string>("flags[]", item.Name.Replace("Flag", "").ToLower()));
+                }
+                if (item.Name == "Weight" && !string.IsNullOrWhiteSpace(item.Value))
+                    list.Add(new KeyValuePair<string, string>("weight", item.Value));
+            }
+
             var postData = GetPostData(encoding, list);
 
             HttpClientHandler httpClientHandler = new HttpClientHandler()

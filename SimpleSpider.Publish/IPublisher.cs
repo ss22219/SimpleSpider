@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SimpleSpider.Publish
@@ -20,12 +21,27 @@ namespace SimpleSpider.Publish
         }
         public abstract string PublisherName { get; }
         public string Name { get; set; }
+
         public abstract List<Option> Options { get; set; }
+        public abstract List<Option> ArticalOptions { get; set; }
+
         public abstract Task<PublishResult> Publish(Dictionary<string, string> data);
 
         public PublishResult Result(bool success = true, string message = null)
         {
             return new PublishResult() { Success = success, Message = message };
+        }
+
+
+        protected List<string> GetImages(string content)
+        {
+            var list = new List<string>();
+            foreach (Match item in new Regex(@"<img\s+!data-append[^<>]+?src=['""]?([^'""<>]+)['""]?[^<>]+?>", RegexOptions.IgnoreCase | RegexOptions.Multiline).Matches(content))
+            {
+                if (item.Groups[0].Value.IndexOf("data-append") == -1)
+                    list.Add(item.Groups[1].Value);
+            }
+            return list;
         }
     }
 }
