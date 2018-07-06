@@ -68,6 +68,7 @@
     <Compile Include="Commands\DataCommand.cs" />
     <Compile Include="Commands\ExportJsonCommand.cs" />
     <Compile Include="Commands\ExportSqlServerCommand.cs" />
+    <Compile Include="Commands\IfCommand.cs" />
     <Compile Include="Commands\ForeachCommand.cs" />
     <Compile Include="Commands\HtmlClearCommand.cs" />
     <Compile Include="Commands\HtmlDecodeCommand.cs" />

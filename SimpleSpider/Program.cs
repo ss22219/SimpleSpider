@@ -1,4 +1,5 @@
-﻿using SimpleSpider.Command;
+﻿using Newtonsoft.Json.Linq;
+using SimpleSpider.Command;
 using SimpleSpider.Config;
 using SimpleSpider.Config.Model;
 using System;
@@ -63,6 +64,7 @@ namespace SimpleSpider
             var content = GetString(result.PipelineOutput);
             if (content.Length > 200)
                 content = content.Substring(0, 200);
+            content = content.Replace("\r", "").Replace("\n", "");
             Console.WriteLine($"{new string('-', node.Indent * 4)}> {content}");
         }
 
@@ -72,6 +74,8 @@ namespace SimpleSpider
             {
                 if (obj is string)
                     return $"\"{(string)obj}\"";
+                else if (obj is JToken)
+                    return "JToken";
                 else if (obj is IEnumerable)
                 {
                     var content = "[";
@@ -164,8 +168,8 @@ namespace SimpleSpider
             }
 
             if (result.Success)
-                if (node.Childs.Count != 0)
-                    ExcuteChild(node.Childs, (IEnumerable)pipeline, data);
+                if (node.Childs.Count != 0 && pipeline != null)
+                    ExcuteChild(node.Childs, pipeline is IEnumerable ? (IEnumerable)pipeline : new object[] { pipeline }, data);
                 else
                     errorNode = node;
 
