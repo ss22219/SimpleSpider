@@ -30,6 +30,8 @@ namespace SimpleSpider.UI
 
         void Log(string msg)
         {
+            if (msg == null)
+                throw new Exception();
             try
             {
                 BeginInvoke(new Action(() =>
@@ -54,8 +56,11 @@ namespace SimpleSpider.UI
             int i = 0;
             foreach (var item in Data)
             {
+                int count = 0;
+                Start:
                 var content = item.content;
                 var title = item.title;
+
                 if (cbReplaceWord.Checked)
                 {
                     var wordserverUrl = ConfigurationManager.AppSettings["wordserver_url"];
@@ -81,19 +86,23 @@ namespace SimpleSpider.UI
                     {"title",title },
                     {"content",content}
                 });
-                Log(result.Message);
                 if (!result.Success)
                 {
-                    Log("发布错误");
-                    return;
+                    Log("发布错误 \r\n title:" + title + "\r\ncontent:" + content + "\r\n" + result.Message);
+                    if (result.Message.IndexOf("标题不能为空") != -1 && !string.IsNullOrWhiteSpace(title) && count < 3)
+                    {
+                        Log("尝试重新发布");
+                        count++;
+                        goto Start;
+                    }
                 }
                 else
                 {
                     PublishedData.Add(item);
                     Log(" 发布成功：" + item.title);
-                    i++;
-                    SetProcess(i);
                 }
+                i++;
+                SetProcess(i);
             }
             Log("发布结束");
             Close();
@@ -131,6 +140,8 @@ namespace SimpleSpider.UI
             SetProcess(0);
             cbPublisher.DisplayMember = "Name";
             cbPublisher.DataSource = UserConfig.Publishers.ToArray();
+            if (lastPublisher != null && UserConfig.Publishers.Any(l => l == lastPublisher))
+                cbPublisher.SelectedIndex = UserConfig.Publishers.IndexOf(lastPublisher);
         }
 
         private void LoadArticalOptions(Publisher publisher)
@@ -321,6 +332,7 @@ namespace SimpleSpider.UI
         private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
             var publisher = (Publisher)((ComboBox)sender).SelectedValue;
+            lastPublisher = publisher;
             if (UserConfig.UIOptions.ContainsKey(publisher))
             {
                 if (UserConfig.UIOptions[publisher].ContainsKey("imgAlt"))
@@ -388,10 +400,12 @@ namespace SimpleSpider.UI
             if (listBox1.SelectedItems.Count > 0)
                 new FrmShowLog(listBox1.SelectedItems[0].ToString()).Show();
         }
-
+        public static Publisher lastPublisher;
         private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
         {
             var publisher = (Publisher)cbPublisher.SelectedValue;
+            if (!UserConfig.UIOptions.ContainsKey(publisher))
+                UserConfig.UIOptions[publisher] = new Dictionary<string, string>();
             UserConfig.UIOptions[publisher]["imgAlt"] = txtImgAlt.Text;
             UserConfig.UIOptions[publisher]["append"] = txtAppend.Text;
             UserConfig.Save();

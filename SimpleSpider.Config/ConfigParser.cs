@@ -27,14 +27,18 @@ namespace SimpleSpider.Config
 
     public class ConfigParser
     {
-        List<string> _commandNames;
-        public ConfigParser()
-        {
+        string[] innerCommands = new string[] { "include" };
 
-        }
-        public ConfigParser(List<string> commandNames)
+        public List<string> CommandNames;
+        public string IncludePath;
+        public ConfigParser(string includePath = "")
         {
-            _commandNames = commandNames;
+            this.IncludePath = includePath;
+        }
+        public ConfigParser(List<string> commandNames, string includePath = "")
+        {
+            this.CommandNames = commandNames;
+            this.IncludePath = includePath;
         }
 
         public const string ENGINE = "engine";
@@ -84,7 +88,7 @@ namespace SimpleSpider.Config
                 if (node.Name == null)
                     continue;
 
-                if (_commandNames != null && !_commandNames.Contains(node.Name))
+                if (CommandNames != null && (!CommandNames.Contains(node.Name) && !innerCommands.Contains(node.Name)))
                     throw new ConfigParseException(lineNum, node.Indent, $"{node.Name} 命令不存在！");
                 if (node.Indent > last.Indent)
                 {
@@ -113,10 +117,44 @@ namespace SimpleSpider.Config
                     node.Parent = tmpNode.Parent;
                     tmpNode.Parent.Childs.Add(node);
                 }
-
+                if (node.Name == "include")
+                {
+                    includeParse(node);
+                    node = last;
+                }
                 last = node;
             }
             return root;
+        }
+
+        private void resetIndent(Node node, int indent)
+        {
+            foreach (var item in node.Childs)
+            {
+                resetIndent(item, node.Indent - node.Parent.Indent + indent);
+            }
+            node.Indent = indent;
+        }
+
+        private void includeParse(Node includeNode)
+        {
+            if (includeNode.Args.Count == 0)
+                throw new ConfigParseException(includeNode.Line, 0, "参数不正确");
+            var file = IncludePath + "\\" + includeNode.Args[0];
+            if (!File.Exists(file))
+                throw new ConfigParseException(includeNode.Line, 0, $"引入文件不存在 {file}");
+
+            var content = File.ReadAllText(file);
+            var root = Parse(content);
+            if (root.Childs.Count > 0)
+            {
+                foreach (var item in root.Childs)
+                {
+                    includeNode.Parent.Childs.Add(item);
+                    resetIndent(item, includeNode.Indent);
+                }
+            }
+            includeNode.Parent.Childs.Remove(includeNode);
         }
 
         enum NodeParseStatus

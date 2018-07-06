@@ -15,10 +15,23 @@ namespace SimpleSpider.UI
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            
-            Application.Run(new FrmMain());
+            bool ret;
+            System.Threading.Mutex mutex = new System.Threading.Mutex(true, Application.ProductName, out ret);
+            if (ret)
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                Application.Run(new FrmMain());
+                mutex.ReleaseMutex();
+            }
+            else
+            {
+                var hwnd = Win32API.FindWindow(null, "发布中心");
+                Win32API.ShowWindow(hwnd, 1);
+                Win32API.SetForegroundWindow(hwnd);
+                Application.Exit();//退出程序   
+            }
         }
     }
 }

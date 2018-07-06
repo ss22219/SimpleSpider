@@ -20,7 +20,16 @@ namespace SimpleSpider.UI
 
         private void FrmShowLog_Load(object sender, EventArgs e)
         {
+            if (textBox1.Text.Trim().StartsWith("<"))
+            {
+                this.webBrowser1.DocumentText = textBox1.Text;
+                this.webBrowser1.Visible = true;
+            }
+        }
 
+        private void 源码ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.webBrowser1.Visible = false;
         }
     }
 }

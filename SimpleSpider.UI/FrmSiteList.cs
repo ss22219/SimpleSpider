@@ -21,7 +21,8 @@ namespace SimpleSpider.UI
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            Edit((Publisher)dataGridView1.Rows[e.RowIndex].DataBoundItem);
+            if (e.RowIndex >= 0)
+                Edit((Publisher)dataGridView1.Rows[e.RowIndex].DataBoundItem);
         }
 
         void Edit(Publisher publisher)

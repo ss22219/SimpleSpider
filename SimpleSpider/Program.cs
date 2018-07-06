@@ -30,7 +30,7 @@ namespace SimpleSpider
         static void ExcuteTask(string configFile)
         {
             var configFiles = new string[] { configFile };
-            var parser = new ConfigParser(CommandManage.Commands.Select(c => c.Key).ToList());
+            var parser = new ConfigParser(CommandManage.Commands.Select(c => c.Key).ToList(), Path.GetDirectoryName(configFile));
             foreach (var config in configFiles)
             {
                 errorNode = null;
@@ -60,9 +60,32 @@ namespace SimpleSpider
 
         static void Log(Node node, CommandResult result)
         {
+            var content = GetString(result.PipelineOutput);
+            if (content.Length > 200)
+                content = content.Substring(0, 200);
+            Console.WriteLine($"{new string('-', node.Indent * 4)}> {content}");
+        }
 
-            if (result.PipelineOutput != null)
-                Console.WriteLine($"{new string('-', node.Indent * 4)}> {result.PipelineOutput}");
+        static string GetString(object obj)
+        {
+            if (obj != null)
+            {
+                if (obj is string)
+                    return $"\"{(string)obj}\"";
+                else if (obj is IEnumerable)
+                {
+                    var content = "[";
+                    foreach (var item in (IEnumerable)obj)
+                    {
+                        content += GetString(item) + ",";
+                    }
+                    content = content.TrimEnd(',') + "]";
+                    return content;
+                }
+                else
+                    return obj.ToString();
+            }
+            return string.Empty;
         }
 
         static Dictionary<string, string> Clone(Dictionary<string, string> dic)
@@ -110,6 +133,7 @@ namespace SimpleSpider
                     if (@break)
                     {
                         @break = false;
+                        result.PipelineOutput = pipeline;
                         return result;
                     }
                 }

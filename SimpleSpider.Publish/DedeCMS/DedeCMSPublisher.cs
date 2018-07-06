@@ -75,7 +75,7 @@ namespace SimpleSpider.Publish.DedeCMS
                 new Option() { Name = "SiteUrl",DisplayName="后台地址", OptionInputType= OptionInputType.Text},
                 new Option() { Name = "Encoding", DisplayName = "编码", Value="utf-8", OptionInputType= OptionInputType.Select, SelectValues = new List<KeyValuePair<string, string>>() {
                     new KeyValuePair<string, string>("utf-8","utf-8"),
-                    new KeyValuePair<string, string>("gb2312","gb2312")
+                    new KeyValuePair<string, string>("gbk","gbk")
                 } },
                 new  Option() {Name= "Cookie", DisplayName = "Cookie" , OptionInputType = OptionInputType.Cookie, SelectValues = new List<KeyValuePair<string, string>>() {
                     new KeyValuePair<string, string>("Url", "{SiteUrl}")

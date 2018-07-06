@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blogs\SinaPublisher.cs" />
     <Compile Include="DedeCMS\DedeCMSPublisher.cs" />
     <Compile Include="IPublisher.cs" />
     <Compile Include="Option.cs" />

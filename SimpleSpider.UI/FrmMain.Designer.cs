@@ -59,6 +59,7 @@
             this.ClientSize = new System.Drawing.Size(511, 312);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
+            this.MaximizeBox = false;
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "发布中心";
