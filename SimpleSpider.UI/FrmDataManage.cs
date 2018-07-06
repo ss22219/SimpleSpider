@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using Dapper;
 namespace SimpleSpider.UI
 {
-    public partial class FrmDataManage : Form
+    public partial class FrmDataManage : FormBase
     {
         private string tableName;
         private string connectionString;

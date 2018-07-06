@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmSiteList : Form
+    public partial class FrmSiteList : FormBase
     {
         public FrmSiteList()
         {

@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="inc.ss" />
     <None Include="test.ss" />
     <None Include="packages.config" />
   </ItemGroup>

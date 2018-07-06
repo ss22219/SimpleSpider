@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmShowLog : Form
+    public partial class FrmShowLog : FormBase
     {
         public FrmShowLog(string msg)
         {

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmMain : Form
+    public partial class FrmMain : FormBase
     {
         public FrmMain()
         {

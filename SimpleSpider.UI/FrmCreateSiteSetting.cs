@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmCreateSiteSetting : Form
+    public partial class FrmCreateSiteSetting : FormBase
     {
         public Publisher Publisher;
         public FrmCreateSiteSetting()

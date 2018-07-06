@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
@@ -17,7 +18,7 @@ using static SimpleSpider.UI.FrmDataManage;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmPublish : Form
+    public partial class FrmPublish : FormBase
     {
         public List<ArticleInfo> Data { get; set; }
         public List<ArticleInfo> PublishedData = new List<ArticleInfo>();
@@ -32,20 +33,24 @@ namespace SimpleSpider.UI
             try
             {
                 BeginInvoke(new Action(() =>
-                    listView1.Items.Add(msg)
+                    listBox1.Items.Add(msg)
                 ));
             }
             catch (Exception)
             {
             }
         }
-        
+
 
         private async void btnPublish_Click(object sender, EventArgs e)
         {
-
             button2.Enabled = false;
-            var publisher = (Publisher)comboBox1.SelectedItem;
+            var publisher = (Publisher)cbPublisher.SelectedItem;
+            if (publisher.ArticalOptions.Any(o => o.Required && string.IsNullOrEmpty(o.Value)))
+            {
+                MessageBox.Show("发布选项 " + publisher.ArticalOptions.FirstOrDefault(o => o.Required && string.IsNullOrEmpty(o.Value)).DisplayName + " 不能为空");
+                return;
+            }
             int i = 0;
             foreach (var item in Data)
             {
@@ -70,10 +75,11 @@ namespace SimpleSpider.UI
                         return;
                     }
                 }
-
+                content = content + txtAppend.Text;
+                content = SetImgAlt(content);
                 var result = await publisher.Publish(new Dictionary<string, string>() {
                     {"title",title },
-                    {"content",content + txtAppend.Text }
+                    {"content",content}
                 });
                 Log(result.Message);
                 if (!result.Success)
@@ -91,6 +97,17 @@ namespace SimpleSpider.UI
             }
             Log("发布结束");
             Close();
+        }
+
+        private string SetImgAlt(string content)
+        {
+            var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+            htmlDoc.LoadHtml(content);
+            foreach (var img in htmlDoc.DocumentNode.Descendants("img"))
+            {
+                img.SetAttributeValue("alt", txtImgAlt.Text);
+            }
+            return htmlDoc.DocumentNode.OuterHtml;
         }
 
         private void SetProcess(int count)
@@ -112,9 +129,8 @@ namespace SimpleSpider.UI
                 cbReplaceWord.Checked = true;
             }
             SetProcess(0);
-            comboBox1.DisplayMember = "Name";
-            comboBox1.DataSource = UserConfig.Publishers.ToArray();
-
+            cbPublisher.DisplayMember = "Name";
+            cbPublisher.DataSource = UserConfig.Publishers.ToArray();
         }
 
         private void LoadArticalOptions(Publisher publisher)
@@ -132,8 +148,8 @@ namespace SimpleSpider.UI
                     var label = new Label() { Text = option.DisplayName + ": ", Name = "lb" + option.Name, Top = top + 5, Left = left, Width = 100 };
                     var size = label.CreateGraphics().MeasureString(label.Text, label.Font);
                     label.Width = (int)size.Width + 5;
-
-                    var textbox = new TextBox() { Text = option.Value, Name = option.Name, Top = top + 1, Left = label.Width + left, Width = 100 };
+                    left += label.Width;
+                    var textbox = new TextBox() { Text = option.Value, Name = option.Name, Top = top + 1, Left = left, Width = 100 };
                     size = textbox.CreateGraphics().MeasureString(textbox.Text, textbox.Font);
 
                     textbox.Width = (int)size.Width + 10;
@@ -190,6 +206,62 @@ namespace SimpleSpider.UI
                     control = combox;
                     this.groupBox1.Controls.Add(combox);
                 }
+                else if (option.OptionInputType == OptionInputType.RemoteMatch)
+                {
+                    var label = new Label() { Text = option.DisplayName + ": ", Name = "lb" + option.Name, Top = top + 5, Left = left, Width = 100 };
+                    var size = label.CreateGraphics().MeasureString(label.Text, label.Font);
+                    label.Width = (int)size.Width + 5;
+
+                    left += label.Width;
+                    var combox = new ComboBox() { Text = option.Value, Name = option.Name, Top = top, Left = left, Width = 100 };
+                    combox.DisplayMember = "Key";
+                    combox.ValueMember = "Value";
+                    combox.Click += new EventHandler((sender, ev) =>
+                    {
+                        var val = combox.Text;
+                        if (combox.DataSource == null)
+                        {
+                            var option1 = publisher.ArticalOptions.Where(o => o.Name == combox.Name).FirstOrDefault();
+                            var url = ReplaceParam(option1.SelectValues[0].Key);
+                            var regexRule = option1.SelectValues[0].Value;
+                            if (!url.StartsWith("http"))
+                            {
+                                MessageBox.Show("地址不正确");
+                                return;
+                            }
+                            var client = new WebClient();
+                            client.Headers["Cookie"] = GetOption("Cookie").Value;
+                            var data = client.DownloadData(ReplaceParam(url));
+                            var encodingOption = GetOption("Encoding");
+                            var encoding = Encoding.GetEncoding(encodingOption == null ? "utf-8" : encodingOption.Value);
+                            var content = encoding.GetString(data);
+                            List<KeyValuePair<string, string>> selectValues = new List<KeyValuePair<string, string>>();
+                            if (!new Regex(regexRule).IsMatch(content))
+                            {
+                                MessageBox.Show("获取栏目失败，可能Cookie已经失效");
+                                return;
+                            }
+                            foreach (Match item in new Regex(regexRule).Matches(content))
+                            {
+                                selectValues.Add(new KeyValuePair<string, string>(item.Groups["Name"].Value, item.Groups["Value"].Value));
+                            }
+                            combox.DataSource = selectValues;
+                            if (!string.IsNullOrEmpty(val))
+                                combox.SelectedValue = val;
+                        }
+                    });
+
+                    combox.SelectedIndexChanged += new EventHandler((sender, ev) =>
+                    {
+                        var option1 = GetOption(combox.Name);
+                        option.Value = combox.SelectedValue.ToString();
+                    });
+                    combox.Tag = label;
+                    control = combox;
+                    this.groupBox1.Controls.Add(label);
+                    this.groupBox1.Controls.Add(combox);
+                }
+
                 if (control.Right > maxWidth)
                 {
                     line++;
@@ -197,7 +269,7 @@ namespace SimpleSpider.UI
 
                     control.Top += 30;
                     control.Left = left;
-                    if (control is TextBox)
+                    if (control.Tag != null)
                     {
                         var label = (Label)control.Tag;
                         label.Top += 30;
@@ -212,6 +284,28 @@ namespace SimpleSpider.UI
             this.Height += this.groupBox1.Height - old;
         }
 
+        private Option GetOption(string name)
+        {
+            var publisher = (Publisher)cbPublisher.SelectedValue;
+            var option = publisher.Options.Where(p => p.Name == name).FirstOrDefault();
+            if (option == null)
+                option = publisher.ArticalOptions.Where(p => p.Name == name).FirstOrDefault();
+            return option;
+        }
+
+        private string ReplaceParam(string express)
+        {
+            var publisher = (Publisher)cbPublisher.SelectedValue;
+            if (express == null)
+                return string.Empty;
+            foreach (var item in publisher.Options)
+            {
+                if (express.IndexOf("{" + item.Name + "}") != -1)
+                    express = express.Replace("{" + item.Name + "}", item.Value);
+            }
+            return express;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             var frm = new FrmSiteList();
@@ -221,31 +315,29 @@ namespace SimpleSpider.UI
 
         private void Frm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            comboBox1.DataSource = UserConfig.Publishers.ToArray();
-        }
-
-        private void listView1_DoubleClick(object sender, EventArgs e)
-        {
-            if (listView1.SelectedItems.Count > 0)
-                new FrmShowLog(listView1.SelectedItems[0].Text).Show();
-        }
-
-        private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
+            cbPublisher.DataSource = UserConfig.Publishers.ToArray();
         }
 
         private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
-            LoadArticalOptions((Publisher)((ComboBox)sender).SelectedValue);
+            var publisher = (Publisher)((ComboBox)sender).SelectedValue;
+            if (UserConfig.UIOptions.ContainsKey(publisher))
+            {
+                if (UserConfig.UIOptions[publisher].ContainsKey("imgAlt"))
+                    txtImgAlt.Text = UserConfig.UIOptions[publisher]["imgAlt"];
+                if (UserConfig.UIOptions[publisher].ContainsKey("imgAlt"))
+                    txtAppend.Text = UserConfig.UIOptions[publisher]["append"];
+            }
+            LoadArticalOptions(publisher);
         }
 
         private void FrmPublish_Resize(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedValue != null)
-                comboBox1_SelectedValueChanged(comboBox1, null);
-            this.listView1.Top = this.groupBox1.Bottom + 40;
-            this.listView1.Height = this.Height - this.groupBox1.Bottom - 40;
-            this.label2.Top = this.listView1.Top - 23;
+            if (cbPublisher.SelectedValue != null)
+                comboBox1_SelectedValueChanged(cbPublisher, null);
+            this.listBox1.Top = this.groupBox1.Bottom + 40;
+            this.listBox1.Height = this.Height - this.groupBox1.Bottom - 40;
+            this.label2.Top = this.listBox1.Top - 23;
         }
 
         async Task<string> UploadImage()
@@ -289,6 +381,20 @@ namespace SimpleSpider.UI
             var url = await UploadImage();
             if (!string.IsNullOrEmpty(url))
                 txtAppend.Text += "<img data-append src=\"" + url + "\" />";
+        }
+
+        private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (listBox1.SelectedItems.Count > 0)
+                new FrmShowLog(listBox1.SelectedItems[0].ToString()).Show();
+        }
+
+        private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var publisher = (Publisher)cbPublisher.SelectedValue;
+            UserConfig.UIOptions[publisher]["imgAlt"] = txtImgAlt.Text;
+            UserConfig.UIOptions[publisher]["append"] = txtAppend.Text;
+            UserConfig.Save();
         }
     }
 }

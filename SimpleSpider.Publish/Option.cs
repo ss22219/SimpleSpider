@@ -23,5 +23,6 @@ namespace SimpleSpider.Publish
         public OptionInputType OptionInputType { get; set; }
         public List<KeyValuePair<string,string>> SelectValues { get; set; }
         public string Value { get; set; }
+        public bool Required { get; set; }
     }
 }

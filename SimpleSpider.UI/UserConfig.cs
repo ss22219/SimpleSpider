@@ -27,6 +27,7 @@ namespace SimpleSpider.UI
             });
 
             Publishers = new List<Publisher>();
+            UIOptions = new Dictionary<Publisher, Dictionary<string, string>>();
             if (File.Exists("userConfig.json"))
             {
                 var configList = JsonConvert.DeserializeObject<List<PublisherConfig>>(File.ReadAllText("userConfig.json"));
@@ -34,11 +35,24 @@ namespace SimpleSpider.UI
                 {
                     var publisher = CreatePublisher(config.PublisherName);
                     publisher.Name = config.Name;
-                    foreach (var item in config.Option)
-                    {
-                        publisher.Options.FirstOrDefault(o => o.Name == item.Key).Value = item.Value;
-                    }
+                    if (config.Option != null)
+                        foreach (var item in config.Option)
+                        {
+                            var option = publisher.Options.FirstOrDefault(o => o.Name == item.Key);
+                            if (option != null)
+                                option.Value = item.Value;
+                        }
+
+                    if (config.ArticalOptions != null)
+                        foreach (var item in config.ArticalOptions)
+                        {
+                            var option = publisher.ArticalOptions.FirstOrDefault(o => o.Name == item.Key);
+                            if (option != null)
+                                option.Value = item.Value;
+                        }
                     Publishers.Add(publisher);
+                    config.UIOptions = config.UIOptions == null ? new Dictionary<string, string>() : config.UIOptions;
+                    UIOptions[publisher] = config.UIOptions;
                 }
             }
         }
@@ -52,17 +66,29 @@ namespace SimpleSpider.UI
                 {
                     Name = item.Name,
                     PublisherName = item.PublisherName,
-                    Option = new Dictionary<string, string>()
+                    Option = new Dictionary<string, string>(),
+                    ArticalOptions = new Dictionary<string, string>()
                 };
-                foreach (var option in item.Options)
-                {
-                    config.Option[option.Name] = option.Value;
-                }
+                if (item.Options != null)
+                    foreach (var option in item.Options)
+                    {
+                        config.Option[option.Name] = option.Value;
+                    }
+
+                if (item.ArticalOptions != null)
+                    foreach (var option in item.ArticalOptions)
+                    {
+                        config.ArticalOptions[option.Name] = option.Value;
+                    }
+                if (UIOptions.ContainsKey(item))
+                    config.UIOptions = UIOptions[item];
                 configList.Add(config);
             }
 
             File.WriteAllText("userConfig.json", JsonConvert.SerializeObject(configList));
         }
+
+        public static Dictionary<Publisher, Dictionary<string, string>> UIOptions { get; set; }
         public static List<Publisher> Publishers { get; set; }
     }
 
@@ -71,5 +97,7 @@ namespace SimpleSpider.UI
         public string PublisherName { get; set; }
         public string Name { get; set; }
         public Dictionary<string, string> Option { get; set; }
+        public Dictionary<string, string> ArticalOptions { get; set; }
+        public Dictionary<string, string> UIOptions { get; set; }
     }
 }

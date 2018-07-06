@@ -54,6 +54,9 @@ namespace SimpleSpider.Publish.DedeCMS
         private void initializationArticalOptions()
         {
             _articalOptions = new List<Option>() {
+                new  Option() {Name= "TypeId", DisplayName = "栏目ID", OptionInputType= OptionInputType.RemoteMatch, Required = true, SelectValues =new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("{SiteUrl}/makehtml_list.php", @"<option value='(?<Value>\d+)'>(?<Name>[^<>]+)</option>"),
+                }},
                 new Option() { Name = "FlagH", DisplayName="头条", OptionInputType= OptionInputType.CheckBox},
                 new Option() { Name = "FlagC", DisplayName="推荐", OptionInputType= OptionInputType.CheckBox},
                 new Option() { Name = "FlagF", DisplayName="幻灯", OptionInputType= OptionInputType.CheckBox},
@@ -76,10 +79,7 @@ namespace SimpleSpider.Publish.DedeCMS
                 } },
                 new  Option() {Name= "Cookie", DisplayName = "Cookie" , OptionInputType = OptionInputType.Cookie, SelectValues = new List<KeyValuePair<string, string>>() {
                     new KeyValuePair<string, string>("Url", "{SiteUrl}")
-                } },
-                new  Option() {Name= "TypeId", DisplayName = "栏目ID", OptionInputType= OptionInputType.RemoteMatch, SelectValues =new List<KeyValuePair<string, string>>() {
-                    new KeyValuePair<string, string>("{SiteUrl}/makehtml_list.php", @"<option value='(?<Value>\d+)'>(?<Name>[^<>]+)</option>"),
-                }}
+                } }
             };
         }
 
@@ -98,7 +98,6 @@ namespace SimpleSpider.Publish.DedeCMS
             var encoding = Encoding.GetEncoding(GetOptionValue("Encoding"));
             var list = new List<KeyValuePair<string, string>>() {
                 new KeyValuePair<string, string>("title", data["title"]),
-                new KeyValuePair<string, string>("typeid", GetOptionValue("TypeId")),
                 new KeyValuePair<string, string>("body", data["content"]),
                 new KeyValuePair<string, string>("channelid","1"),
                 new KeyValuePair<string, string>("dopost","save"),
@@ -114,17 +113,22 @@ namespace SimpleSpider.Publish.DedeCMS
                 new KeyValuePair<string, string>("notpost", "0"),
                 new KeyValuePair<string, string>("click", new Random().Next(100,999).ToString()),
             };
-            var images = GetImages(data["title"]);
+            var images = GetImages(data["content"]);
             foreach (var item in ArticalOptions)
             {
                 if (item.Name.StartsWith("Flag") && item.Value == "True")
                 {
-                    if (item.Name == "AutolitPic" && images.Any())
-                        list.Add(new KeyValuePair<string, string>("picname", images.FirstOrDefault()));
                     list.Add(new KeyValuePair<string, string>("flags[]", item.Name.Replace("Flag", "").ToLower()));
                 }
-                if (item.Name == "Weight" && !string.IsNullOrWhiteSpace(item.Value))
+                else if (item.Name == "AutolitPic" && item.Value == "True" && images.Any())
+                {
+                    list.Add(new KeyValuePair<string, string>("picname", images.FirstOrDefault()));
+                    list.Add(new KeyValuePair<string, string>("autolitpic", "1"));
+                }
+                else if (item.Name == "Weight" && !string.IsNullOrWhiteSpace(item.Value))
                     list.Add(new KeyValuePair<string, string>("weight", item.Value));
+                else if (item.Name == "TypeId" && !string.IsNullOrWhiteSpace(item.Value))
+                    list.Add(new KeyValuePair<string, string>("typeid", item.Value));
             }
 
             var postData = GetPostData(encoding, list);

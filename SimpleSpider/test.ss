@@ -14,6 +14,7 @@
 			data url
 			httper utf-8
 			xpath title=/html/head/meta[8]=attr[content] content=//*[@id="mp-editor"]=html
+			break title='' content=''
 			#image-download content
 			htmlclear content
 			htmldecode title

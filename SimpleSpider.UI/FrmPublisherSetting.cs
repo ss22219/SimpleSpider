@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmPublisherSetting : Form
+    public partial class FrmPublisherSetting : FormBase
     {
         Publisher publisher;
         Publisher publisherBack;

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmLogin : Form
+    public partial class FrmLogin : FormBase
     {
         public FrmLogin(string url)
         {
