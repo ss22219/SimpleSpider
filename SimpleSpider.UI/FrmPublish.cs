@@ -105,7 +105,6 @@ namespace SimpleSpider.UI
                 SetProcess(i);
             }
             Log("发布结束");
-            Close();
         }
 
         private string SetImgAlt(string content)

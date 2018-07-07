@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Blogs\SinaPublisher.cs" />
     <Compile Include="DedeCMS\DedeCMSPublisher.cs" />
+    <Compile Include="HttpWebClient.cs" />
     <Compile Include="IPublisher.cs" />
     <Compile Include="Option.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
