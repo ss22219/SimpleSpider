@@ -44,7 +44,11 @@ namespace SimpleSpider.Command.Commands
             {
                 try
                 {
-                    var path = "simplespider" + FileMetadataUtility.GetSavePath(DateTime.Now.Ticks, ".png");
+                    string path = null;
+                    lock (this.Name)
+                    {
+                        path = "simplespider" + FileMetadataUtility.GetSavePath(DateTime.Now.Ticks, ".png");
+                    }
                     start:
                     var result = await cosApi.UploadFile(bucketName, path, ms);
 

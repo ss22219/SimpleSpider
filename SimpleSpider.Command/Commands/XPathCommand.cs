@@ -10,6 +10,13 @@ namespace SimpleSpider.Command.Commands
 {
     public class XPathCommand : ICommand
     {
+        class Rule
+        {
+            public string Name { get; set; }
+            public string Xpath { get; set; }
+            public string ValueType { get; set; }
+        }
+
         public string Name
         {
             get
@@ -18,56 +25,57 @@ namespace SimpleSpider.Command.Commands
             }
         }
 
-        string getVal(string[] set, HtmlNode node)
+        string getVal(Rule rule, HtmlNode node)
         {
-            var par = set.Last();
             var val = "";
-            if (set.Length == 2)
+            if (string.IsNullOrEmpty(rule.ValueType))
                 val = node.InnerText;
-            else if (par == "text")
+            else if (rule.ValueType == "text")
                 val = node.InnerText;
-            else if (par == "html")
+            else if (rule.ValueType == "html")
                 val = node.InnerHtml;
-            else if (par == "outhtml")
+            else if (rule.ValueType == "outhtml")
                 val = node.OuterHtml;
-            else if (par.StartsWith("attr"))
-                val = node.Attributes[new Regex(@"\[(\w+)\]").Match(par).Groups[1].Value].Value;
+            else if (rule.ValueType.StartsWith("attr"))
+                val = node.Attributes[new Regex(@"\[(\w+)\]").Match(rule.ValueType).Groups[1].Value].Value;
             else
                 val = node.InnerText;
             return val;
         }
 
-        string getRule(string arg)
+        Rule getRule(string arg)
         {
-            if (!arg.StartsWith("/"))
-            {
-                var set = arg.Split('=');
-                arg = arg.Substring(set[0].Length + 1);
-            }
-            return new Regex(@"=(text|html|outhtml|attr\[\w+\])$").Replace(arg, "");
+            var match = new Regex(@"^([^=/]+=)?(.+?)(=(text|html|outhtml|attr\[\w+\]))*$").Match(arg);
+            return new Rule() { Name = match.Groups[1].Value.TrimEnd('='), Xpath = match.Groups[2].Value, ValueType = match.Groups[4].Value };
         }
 
 
         public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
+            HtmlNode root = null;
+            var html = string.Empty;
+            if (pipelineInput is HtmlNode)
+                html = ((HtmlNode)pipelineInput).OuterHtml;
+            else
+                html = pipelineInput.ToString();
             var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pipelineInput.ToString());
+            htmlDoc.LoadHtml(html);
+            root = htmlDoc.DocumentNode;
+
             foreach (var item in args)
             {
+                var rule = getRule(item);
                 if (!item.StartsWith("/"))
                 {
-                    var set = item.Split('=');
-                    var name = set[0];
-                    var node = htmlDoc.DocumentNode.SelectSingleNode(getRule(item));
+                    var name = rule.Name;
+                    var node = root.SelectSingleNode(rule.Xpath);
                     if (node == null)
-                        return new CommandResult() { Success = false, PipelineOutput = set[1] + " 获取失败" };
-                    data[name] = getVal(set, node);
+                        data[name] = null;
+                    else
+                        data[name] = getVal(rule, node);
                 }
                 else if (args.Length == 1)
-                {
-                    var node = htmlDoc.DocumentNode.SelectSingleNode(getRule(item));
-                    pipelineInput = getVal(args, node);
-                }
+                    pipelineInput = root.SelectNodes(rule.Xpath);
             }
             return new CommandResult() { Success = true, Data = data, PipelineOutput = pipelineInput };
         }

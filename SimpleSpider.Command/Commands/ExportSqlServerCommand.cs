@@ -37,8 +37,10 @@ namespace SimpleSpider.Command.Commands
 	[publish] [bit] default(0) NOT NULL)";
                     connection.Execute(createSql);
                 }
+                var removeItems = new List<Dictionary<string, string>>();
                 foreach (var item in ResultCommand.Rows)
                 {
+                    removeItems.Add(item);
                     string cloumnStr = "";
                     string paramStr = "";
                     var sqlParm = new DynamicParameters();
@@ -53,6 +55,7 @@ namespace SimpleSpider.Command.Commands
                     var sql = $"DELETE [{tableName}] WHERE title=@title and source=@source;INSERT INTO [{tableName}] ({cloumnStr}) VALUES ({paramStr})";
                     connection.Execute(sql, sqlParm);
                 }
+                ResultCommand.Rows.RemoveAll(i => removeItems.Contains(i));
             }
             return new CommandResult() { Success = true };
         }
