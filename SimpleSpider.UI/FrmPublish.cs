@@ -1,4 +1,7 @@
-﻿using SimpleSpider.Publish;
+﻿using CefSharp;
+using CefSharp.WinForms;
+using Newtonsoft.Json;
+using SimpleSpider.Publish;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,14 +21,18 @@ using static SimpleSpider.UI.FrmDataManage;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmPublish : FormBase
+    public partial class FrmPublish : Form
     {
+        public ChromiumWebBrowser webBrowser { get; set; }
         public List<ArticleInfo> Data { get; set; }
         public List<ArticleInfo> PublishedData = new List<ArticleInfo>();
+        IBrowser browser;
         public FrmPublish(List<ArticleInfo> data)
         {
             this.Data = data;
+
             InitializeComponent();
+            initWebBrowser();
         }
 
         void Log(string msg)
@@ -43,11 +50,72 @@ namespace SimpleSpider.UI
             }
         }
 
+        void initWebBrowser()
+        {
+            webBrowser = new ChromiumWebBrowser(new Uri(Directory.GetCurrentDirectory() + "/umeditor/index.html").ToString()); //初始页面
+
+            webBrowser.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) | AnchorStyles.Right)));
+            webBrowser.Location = new System.Drawing.Point(1, 53);
+            webBrowser.Size = new System.Drawing.Size(groupBox2.Size.Width, 167);
+            this.webBrowser.FrameLoadEnd += new EventHandler<FrameLoadEndEventArgs>((s,e)=> {
+                browser = this.webBrowser.GetBrowser();
+                setAppendContent(_setContent);
+            });
+
+            this.groupBox2.Controls.Add(webBrowser);
+        }
+
+        string getAppendContent()
+        {
+            if (browser == null)
+                return _setContent;
+            var task = browser.MainFrame.EvaluateScriptAsync("getContent()");
+            task.Wait();
+            if (task.Result == null || !task.Result.Success)
+                return _setContent;
+            return task.Result.Result.ToString();
+        }
+
+        string _setContent;
+        void setAppendContent(string content, bool append = false)
+        {
+            if (content == null)
+                content = "";
+            if (_setContent == null)
+                _setContent = content;
+            if (browser != null)
+            {
+                var script = $"var content = ({JsonConvert.SerializeObject(new { content = content })}).content;setContent(content)";
+                browser.MainFrame.ExecuteJavaScriptAsync(script);
+            }
+        }
+
+        void Save()
+        {
+            var publisher = (Publisher)cbPublisher.SelectedItem;
+            if (publisher == null)
+                return;
+            var appendContent = getAppendContent();
+            if (appendContent == null)
+                return;
+            btnPublish.Enabled = false;
+
+            if (!UserConfig.UIOptions.ContainsKey(publisher))
+                UserConfig.UIOptions[publisher] = new Dictionary<string, string>();
+            UserConfig.UIOptions[publisher]["imgAlt"] = txtImgAlt.Text;
+            UserConfig.UIOptions[publisher]["append"] = appendContent;
+            UserConfig.Save();
+        }
 
         private async void btnPublish_Click(object sender, EventArgs e)
         {
-            button2.Enabled = false;
             var publisher = (Publisher)cbPublisher.SelectedItem;
+            if (publisher == null)
+                return;
+
+            btnPublish.Enabled = false;
+            Save();
+
             if (publisher.ArticalOptions.Any(o => o.Required && string.IsNullOrEmpty(o.Value)))
             {
                 MessageBox.Show("发布选项 " + publisher.ArticalOptions.FirstOrDefault(o => o.Required && string.IsNullOrEmpty(o.Value)).DisplayName + " 不能为空");
@@ -80,7 +148,8 @@ namespace SimpleSpider.UI
                         return;
                     }
                 }
-                content = content + txtAppend.Text;
+                var appendContent = getAppendContent();
+                content = content + appendContent;
                 content = SetImgAlt(content);
                 var result = await publisher.Publish(new Dictionary<string, string>() {
                     {"title",title },
@@ -103,7 +172,13 @@ namespace SimpleSpider.UI
                 }
                 i++;
                 SetProcess(i);
+                if (numTimeLimit.Value > 0)
+                {
+                    Log(" 等待" + numTimeLimit.Value + "分钟");
+                    await Task.Delay(TimeSpan.FromMinutes((double)numTimeLimit.Value));
+                }
             }
+            this.btnPublish.Enabled = true;
             Log("发布结束");
         }
 
@@ -141,6 +216,8 @@ namespace SimpleSpider.UI
             cbPublisher.DataSource = UserConfig.Publishers.ToArray();
             if (lastPublisher != null && UserConfig.Publishers.Any(l => l == lastPublisher))
                 cbPublisher.SelectedIndex = UserConfig.Publishers.IndexOf(lastPublisher);
+            lastPublisher = null;
+            FrmPublish_Resize(sender, e);
         }
 
         private void LoadArticalOptions(Publisher publisher)
@@ -241,23 +318,31 @@ namespace SimpleSpider.UI
                             }
                             var client = new WebClient();
                             client.Headers["Cookie"] = GetOption("Cookie").Value;
-                            var data = client.DownloadData(ReplaceParam(url));
-                            var encodingOption = GetOption("Encoding");
-                            var encoding = Encoding.GetEncoding(encodingOption == null ? "utf-8" : encodingOption.Value);
-                            var content = encoding.GetString(data);
-                            List<KeyValuePair<string, string>> selectValues = new List<KeyValuePair<string, string>>();
-                            if (!new Regex(regexRule).IsMatch(content))
+                            try
+                            {
+                                var data = client.DownloadData(ReplaceParam(url));
+                                var encodingOption = GetOption("Encoding");
+                                var encoding = Encoding.GetEncoding(encodingOption == null ? "utf-8" : encodingOption.Value);
+                                var content = encoding.GetString(data);
+                                List<KeyValuePair<string, string>> selectValues = new List<KeyValuePair<string, string>>();
+                                if (!new Regex(regexRule).IsMatch(content))
+                                {
+                                    MessageBox.Show("获取栏目失败，可能Cookie已经失效");
+                                    return;
+                                }
+                                foreach (Match item in new Regex(regexRule).Matches(content))
+                                {
+                                    selectValues.Add(new KeyValuePair<string, string>(item.Groups["Name"].Value, item.Groups["Value"].Value));
+                                }
+                                combox.DataSource = selectValues;
+                                if (!string.IsNullOrEmpty(val))
+                                    combox.SelectedValue = val;
+                            }
+                            catch (Exception)
                             {
                                 MessageBox.Show("获取栏目失败，可能Cookie已经失效");
                                 return;
                             }
-                            foreach (Match item in new Regex(regexRule).Matches(content))
-                            {
-                                selectValues.Add(new KeyValuePair<string, string>(item.Groups["Name"].Value, item.Groups["Value"].Value));
-                            }
-                            combox.DataSource = selectValues;
-                            if (!string.IsNullOrEmpty(val))
-                                combox.SelectedValue = val;
                         }
                     });
 
@@ -320,35 +405,42 @@ namespace SimpleSpider.UI
         {
             var frm = new FrmSiteList();
             frm.Show();
-            frm.FormClosing += Frm_FormClosing;
+            frm.FormClosing += FrmSiteSetting_FormClosing;
         }
 
-        private void Frm_FormClosing(object sender, FormClosingEventArgs e)
+        private void FrmSiteSetting_FormClosing(object sender, FormClosingEventArgs e)
         {
             cbPublisher.DataSource = UserConfig.Publishers.ToArray();
+            if (this.WindowState == FormWindowState.Minimized)
+                this.WindowState = FormWindowState.Normal;
+            this.Activate();
         }
 
         private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
             var publisher = (Publisher)((ComboBox)sender).SelectedValue;
-            lastPublisher = publisher;
             if (UserConfig.UIOptions.ContainsKey(publisher))
             {
                 if (UserConfig.UIOptions[publisher].ContainsKey("imgAlt"))
                     txtImgAlt.Text = UserConfig.UIOptions[publisher]["imgAlt"];
                 if (UserConfig.UIOptions[publisher].ContainsKey("imgAlt"))
-                    txtAppend.Text = UserConfig.UIOptions[publisher]["append"];
+                    setAppendContent(UserConfig.UIOptions[publisher]["append"]);
             }
             LoadArticalOptions(publisher);
         }
 
         private void FrmPublish_Resize(object sender, EventArgs e)
         {
+            if (this.Height < 100)
+                return;
             if (cbPublisher.SelectedValue != null)
-                comboBox1_SelectedValueChanged(cbPublisher, null);
-            this.listBox1.Top = this.groupBox1.Bottom + 40;
-            this.listBox1.Height = this.Height - this.groupBox1.Bottom - 40;
-            this.label2.Top = this.listBox1.Top - 23;
+            {
+                var publisher = (Publisher)cbPublisher.SelectedValue;
+                LoadArticalOptions(publisher);
+            }
+            this.groupBox1.Top = this.label2.Top - this.groupBox1.Height - 10;
+            this.groupBox2.Height = this.groupBox1.Top - this.groupBox2.Top - 10;
+            this.webBrowser.Height = this.groupBox2.Height - 60;
         }
 
         async Task<string> UploadImage()
@@ -391,7 +483,7 @@ namespace SimpleSpider.UI
         {
             var url = await UploadImage();
             if (!string.IsNullOrEmpty(url))
-                txtAppend.Text += "<img data-append src=\"" + url + "\" />";
+                setAppendContent("<img data-append src=\"" + url + "\" />", true);
         }
 
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -399,15 +491,19 @@ namespace SimpleSpider.UI
             if (listBox1.SelectedItems.Count > 0)
                 new FrmShowLog(listBox1.SelectedItems[0].ToString()).Show();
         }
+
         public static Publisher lastPublisher;
         private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var publisher = (Publisher)cbPublisher.SelectedValue;
-            if (!UserConfig.UIOptions.ContainsKey(publisher))
-                UserConfig.UIOptions[publisher] = new Dictionary<string, string>();
-            UserConfig.UIOptions[publisher]["imgAlt"] = txtImgAlt.Text;
-            UserConfig.UIOptions[publisher]["append"] = txtAppend.Text;
-            UserConfig.Save();
+            if (cbPublisher.SelectedValue != null)
+                lastPublisher = (Publisher)cbPublisher.SelectedValue;
+            Save();
+            if (FrmDataManage.Instance != null)
+            {
+                if (FrmDataManage.Instance.WindowState == FormWindowState.Minimized)
+                    FrmDataManage.Instance.WindowState = FormWindowState.Normal;
+                FrmDataManage.Instance.Activate();
+            }
         }
     }
 }

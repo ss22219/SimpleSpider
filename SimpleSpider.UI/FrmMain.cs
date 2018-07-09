@@ -12,8 +12,11 @@ namespace SimpleSpider.UI
 {
     public partial class FrmMain : FormBase
     {
+        public static Form Instance { get; set; }
+
         public FrmMain()
         {
+            Instance = this;
             InitializeComponent();
         }
 

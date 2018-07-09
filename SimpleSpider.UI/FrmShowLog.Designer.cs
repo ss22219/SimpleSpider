@@ -73,7 +73,6 @@
             this.源码ToolStripMenuItem.Name = "源码ToolStripMenuItem";
             this.源码ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.源码ToolStripMenuItem.Text = "源码";
-            this.源码ToolStripMenuItem.Click += new System.EventHandler(this.源码ToolStripMenuItem_Click);
             // 
             // FrmShowLog
             // 

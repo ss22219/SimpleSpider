@@ -15,7 +15,7 @@ namespace SimpleSpider.UI
     {
         private string tableName;
         private string connectionString;
-
+        public static Form Instance;
         public class ArticleInfo
         {
             public int id { get; set; }
@@ -28,6 +28,9 @@ namespace SimpleSpider.UI
 
         public FrmDataManage()
         {
+            if (Instance != null)
+                Instance.Close();
+            Instance = this;
             InitializeComponent();
             //禁止用户改变DataGridView1所有行的行高
             dataGridView1.AllowUserToResizeColumns = false;
@@ -77,10 +80,10 @@ namespace SimpleSpider.UI
             }
             var frm = new FrmPublish(data) { Width = Width };
             frm.Show();
-            frm.FormClosing += Frm_FormClosing;
+            frm.FormClosing += FrmPublish_FormClosing;
         }
 
-        private void Frm_FormClosing(object sender, FormClosingEventArgs e)
+        private void FrmPublish_FormClosing(object sender, FormClosingEventArgs e)
         {
             var frm = (FrmPublish)sender;
             if (frm.PublishedData.Count > 0)
@@ -109,6 +112,13 @@ namespace SimpleSpider.UI
         private void 发布ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             button1_Click(null, null);
+        }
+
+        private void FrmDataManage_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Instance = null;
+            FrmMain.Instance.WindowState = FormWindowState.Normal;
+            FrmMain.Instance.Activate();
         }
     }
 }

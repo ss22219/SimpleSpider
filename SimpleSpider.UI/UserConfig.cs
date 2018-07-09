@@ -21,7 +21,7 @@ namespace SimpleSpider.UI
 
         static UserConfig()
         {
-            typeof(Publisher).Assembly.GetTypes().Where(t => t.BaseType == typeof(Publisher)).ToList().ForEach(t =>
+            typeof(Publisher).Assembly.GetTypes().Where(t => t.IsAbstract == false &&( t.BaseType == typeof(Publisher) || t.BaseType.BaseType == typeof(Publisher))).ToList().ForEach(t =>
             {
                 PublisherTypes[((Publisher)typeof(Publisher).Assembly.CreateInstance(t.FullName)).PublisherName] = t;
             });
@@ -33,6 +33,8 @@ namespace SimpleSpider.UI
                 var configList = JsonConvert.DeserializeObject<List<PublisherConfig>>(File.ReadAllText("userConfig.json"));
                 foreach (var config in configList)
                 {
+                    if (!PublisherTypes.ContainsKey(config.PublisherName))
+                        continue;
                     var publisher = CreatePublisher(config.PublisherName);
                     publisher.Name = config.Name;
                     if (config.Option != null)
@@ -53,6 +55,7 @@ namespace SimpleSpider.UI
                     Publishers.Add(publisher);
                     config.UIOptions = config.UIOptions == null ? new Dictionary<string, string>() : config.UIOptions;
                     UIOptions[publisher] = config.UIOptions;
+                    publisher.Cache = config.Cache;
                 }
             }
         }
@@ -82,6 +85,7 @@ namespace SimpleSpider.UI
                     }
                 if (UIOptions.ContainsKey(item))
                     config.UIOptions = UIOptions[item];
+                config.Cache = item.Cache;
                 configList.Add(config);
             }
 
@@ -96,6 +100,7 @@ namespace SimpleSpider.UI
     {
         public string PublisherName { get; set; }
         public string Name { get; set; }
+        public Dictionary<string, string> Cache { get; set; }
         public Dictionary<string, string> Option { get; set; }
         public Dictionary<string, string> ArticalOptions { get; set; }
         public Dictionary<string, string> UIOptions { get; set; }

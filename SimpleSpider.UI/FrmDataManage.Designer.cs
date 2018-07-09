@@ -181,6 +181,7 @@
             this.Name = "FrmDataManage";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "采集数据管理";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmDataManage_FormClosing);
             this.Load += new System.EventHandler(this.FrmDataManage_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);

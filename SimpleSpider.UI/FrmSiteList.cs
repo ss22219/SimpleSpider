@@ -14,8 +14,12 @@ namespace SimpleSpider.UI
 {
     public partial class FrmSiteList : FormBase
     {
+        static Form Instance;
         public FrmSiteList()
         {
+            if (Instance != null)
+                Instance.Close();
+            Instance = this;
             InitializeComponent();
         }
 
@@ -40,6 +44,7 @@ namespace SimpleSpider.UI
                 Bind();
                 UserConfig.Save();
             }
+            Instance = null;
         }
 
         void Bind()

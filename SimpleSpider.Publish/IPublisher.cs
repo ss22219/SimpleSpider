@@ -19,8 +19,15 @@ namespace SimpleSpider.Publish
         {
             return Options.FirstOrDefault(o => o.Name == name).Value;
         }
+
+        public string GetArticelOptionValue(string name)
+        {
+            return ArticalOptions.FirstOrDefault(o => o.Name == name).Value;
+        }
         public abstract string PublisherName { get; }
         public string Name { get; set; }
+
+        public Dictionary<string,string> Cache { get; set; }
 
         public abstract List<Option> Options { get; set; }
         public abstract List<Option> ArticalOptions { get; set; }
