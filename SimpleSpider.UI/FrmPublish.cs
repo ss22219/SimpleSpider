@@ -21,7 +21,7 @@ using static SimpleSpider.UI.FrmDataManage;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmPublish : Form
+    public partial class FrmPublish : FormBase
     {
         public ChromiumWebBrowser webBrowser { get; set; }
         public List<ArticleInfo> Data { get; set; }

@@ -18,7 +18,7 @@ using Titanium.Web.Proxy.Models;
 
 namespace SimpleSpider.UI
 {
-    public partial class FrmLogin : Form
+    public partial class FrmLogin : FormBase
     {
         private ProxyServer proxyServer;
         private ChromiumWebBrowser webBrowser;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace SimpleSpider.UI
 {
@@ -17,11 +18,6 @@ namespace SimpleSpider.UI
                 this.webBrowser1.DocumentText = textBox1.Text;
                 this.webBrowser1.Visible = true;
             }
-        }
-
-        private void 源码ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.webBrowser1.Visible = false;
         }
     }
 }
