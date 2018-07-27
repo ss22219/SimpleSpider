@@ -28,10 +28,10 @@ namespace SimpleSpider
                 .Select(t3 => typeof(CommandManage).Assembly.CreateInstance(t3.FullName)).
                 ToList().ForEach(c => CommandManage.Regist((ICommand)c));
 
-            ExcuteTask(args[0]);
+            ExcuteScript(args[0]);
         }
 
-        static void ExcuteTask(string configFile)
+        static void ExcuteScript(string configFile)
         {
             var configFiles = new string[] { configFile };
             if (Path.GetFileName(configFile).IndexOf("*") != -1)
@@ -42,7 +42,7 @@ namespace SimpleSpider
             foreach (var config in configFiles)
             {
                 var engine = new Engine(logWriter);
-                engine.Excute(File.ReadAllText(config), Path.GetDirectoryName(config));
+                engine.ExcuteFile(config);
             }
         }
     }

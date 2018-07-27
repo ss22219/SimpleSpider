@@ -82,7 +82,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -91,17 +90,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleSpider.Command\SimpleSpider.Command.csproj">
-      <Project>{954E3698-A5C7-4A72-8F02-F8AE65B6C28D}</Project>
-      <Name>SimpleSpider.Command</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleSpider.Config\SimpleSpider.Config.csproj">
-      <Project>{35728F47-92F4-4122-A519-EFA3C82C6163}</Project>
-      <Name>SimpleSpider.Config</Name>
-    </ProjectReference>
+    <Content Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon.ico" />
+    <ProjectReference Include="..\SimpleSpider.Core\SimpleSpider.Core.csproj">
+      <Project>{1fd6eb0c-e0e8-4247-a5d3-f838cfa4bc5c}</Project>
+      <Name>SimpleSpider.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
