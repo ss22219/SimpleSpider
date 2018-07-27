@@ -88,10 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="include.ss" />
-    <None Include="test.ss" />
     <None Include="packages.config" />
-    <None Include="彩票.ss" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleSpider.Command\SimpleSpider.Command.csproj">
