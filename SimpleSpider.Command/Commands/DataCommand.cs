@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SimpleSpider.Command.Commands
@@ -29,9 +30,11 @@ namespace SimpleSpider.Command.Commands
                 {
                     if (item.IndexOf('=') == -1)
                         continue;
-                    var set = item.Split('=');
-                    var setData = string.IsNullOrEmpty(set[1]) || set[1] == "*" ? pipelineInput.ToString() : set[1];
-                    data[set[0]] = setData;
+                    var match = new Regex(@"^(\w+)=(.*)").Match(item);
+                    var name = match.Groups[1].Value;
+                    var val = match.Groups[2].Value;
+                    var setData = string.IsNullOrEmpty(val) || val == "*" ? pipelineInput.ToString() : val;
+                    data[name] = setData;
                 }
             return new CommandResult() { PipelineOutput = pipelineInput, Data = data, Success = true };
         }

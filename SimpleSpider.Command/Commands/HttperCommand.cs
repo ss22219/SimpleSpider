@@ -22,6 +22,7 @@ namespace SimpleSpider.Command.Commands
         {
             try
             {
+                var url = args.FirstOrDefault(a => a.StartsWith("http"));
                 var client = new HttpWebClient();
                 if (args.Select(a => a.ToLower()).Contains("gbk"))
                     client.Encoding = Encoding.GetEncoding("gbk");
@@ -32,7 +33,9 @@ namespace SimpleSpider.Command.Commands
                 {
                     client.Headers[setting.Key] = setting.Value;
                 }
-                var task = client.Get(pipelineInput.ToString());
+                if (string.IsNullOrEmpty(url))
+                    url = pipelineInput.ToString();
+                var task = client.Get(url);
                 task.Wait();
                 return new CommandResult() { Success = true, PipelineOutput = task.Result };
             }

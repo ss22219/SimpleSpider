@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ThoughtWorks.QRCode.Codec.Data;
 
 namespace SimpleSpider.Command.Commands
 {
@@ -36,10 +37,36 @@ namespace SimpleSpider.Command.Commands
             return list;
         }
 
+        protected bool isQrCode(byte[] bytes)
+        {
+            //try
+            //{
+            //    using (var ms = new MemoryStream(bytes))
+            //    {
+            //        using (var bitmap = new System.Drawing.Bitmap(ms))
+            //        {
+            //            var result = new ThoughtWorks.QRCode.Codec.QRCodeDecoder().decode(new QRCodeBitmapImage(bitmap), Encoding.UTF8);
+            //            if (!string.IsNullOrEmpty(result))
+            //                return true;
+            //        }
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //    return false;
+            //}
+            return false;
+        }
+
         protected async Task<ImageInfo> UploadImage(ImageInfo info)
         {
             var uri = new Uri(info.Url);
             var data = new WebClient().DownloadData(uri);
+            if (isQrCode(data))
+            {
+                info.Message = "qrcode";
+                return info;
+            }
             using (var ms = new MemoryStream(data))
             {
                 try
@@ -110,8 +137,8 @@ namespace SimpleSpider.Command.Commands
                     {
                         if (!string.IsNullOrEmpty(item.Result.UploadUrl))
                             content = content.Replace(item.Result.SourceUrl, item.Result.UploadUrl);
-                        else
-                            return new CommandResult() { Success = false, PipelineOutput = item.Result.Message };
+                        else if (item.Result.Message == "qrcode")
+                            content = content.Replace(item.Result.SourceUrl, string.Empty);
                     }
                     data[name] = content;
                 }
