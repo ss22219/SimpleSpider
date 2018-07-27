@@ -1,14 +1,12 @@
-# SimpleSpider Ò»¸ö¼òµ¥µÄÅÀ³æ
-SimpleSpider ÓÉ ÅÀ³æÖ÷³ÌĞò£¬ÅÀ³æ½Å±¾£¬Èë¿â¹ÜÀí 3¸ö²¿·Ö×é³É
+# SimpleSpider ä¸€ä¸ªç®€å•çš„çˆ¬è™«
+SimpleSpider ç”± çˆ¬è™«ä¸»ç¨‹åºï¼Œçˆ¬è™«è„šæœ¬ï¼Œå…¥åº“ç®¡ç† 3ä¸ªéƒ¨åˆ†ç»„æˆ
 
-SimpleSpider.exe ¸ºÔğ½âÎöÔËĞĞ½Å±¾ÎÄ¼ş£¬Ê¹ÓÃ·½·¨
+SimpleSpider.exe è´Ÿè´£è§£æè¿è¡Œè„šæœ¬æ–‡ä»¶ï¼Œä½¿ç”¨æ–¹æ³•
 	SimpleSpider.exe config.ss
 
-config.ss ¼òµ¥µÄÅÀ³æ½Å±¾£¬ÓÉÃüÁîĞòÁĞ¹¹³É£¬ÃüÁîÓÉ SimpleSpider.Command Ìá¹©Ö§³Ö
+config.ss ç®€å•çš„çˆ¬è™«è„šæœ¬ï¼Œç”±å‘½ä»¤åºåˆ—æ„æˆï¼Œå‘½ä»¤ç”± SimpleSpider.Command æä¾›æ”¯æŒ
 ```
 engine
 	command [arg1] [arg2] ....
 			sub_command
 ```
-
-SimpleSpider.UI Ò»¸ö´Ö²ÚµÄÊı¾İ·¢²¼¹ÜÀíÈí¼ş£¬Ä¿Ç°Ö§³ÖDedeCMSÎÄÕÂ·¢²¼
