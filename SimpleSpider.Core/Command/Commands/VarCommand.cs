@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SimpleSpider.Command.Commands
 {
-    public class DataCommand : ICommand
+    public class VarCommand : ICommand
     {
         public string Name
         {
             get
             {
-                return "data";
+                return "var";
             }
         }
 
@@ -22,7 +18,7 @@ namespace SimpleSpider.Command.Commands
             if (args[0].IndexOf('=') == -1)
             {
                 if(!data.ContainsKey(args[0]))
-                    return new CommandResult() { PipelineOutput = $"data[{args[0]}] 不存在！", Success = false };
+                    return new CommandResult() { PipelineOutput = $"var[{args[0]}] 不存在！", Success = false };
                 pipelineInput = data[args[0]];
             }
             else
@@ -33,7 +29,7 @@ namespace SimpleSpider.Command.Commands
                     var match = new Regex(@"^(\w+)=(.*)").Match(item);
                     var name = match.Groups[1].Value;
                     var val = match.Groups[2].Value;
-                    var setData = string.IsNullOrEmpty(val) || val == "*" ? pipelineInput.ToString() : val;
+                    var setData = string.IsNullOrEmpty(val) || val == "${pipeline}" ? pipelineInput.ToString() : val;
                     data[name] = setData;
                 }
             return new CommandResult() { PipelineOutput = pipelineInput, Data = data, Success = true };

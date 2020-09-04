@@ -60,15 +60,11 @@
       <HintPath>..\packages\ThoughtWorks.QRCode.1.1.0\lib\ThoughtWorks.QRCode.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Unreal.QCloud, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unreal.QCloud.1.0.2\lib\net45\Unreal.QCloud.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\CommandManage.cs" />
     <Compile Include="Command\Commands\BreakCommand.cs" />
-    <Compile Include="Command\Commands\DataCommand.cs" />
+    <Compile Include="Command\Commands\VarCommand.cs" />
     <Compile Include="Command\Commands\EngineCommand.cs" />
     <Compile Include="Command\Commands\ExportJsonCommand.cs" />
     <Compile Include="Command\Commands\ExportSqlServerCommand.cs" />
@@ -77,7 +73,6 @@
     <Compile Include="Command\Commands\HtmlDecodeCommand.cs" />
     <Compile Include="Command\Commands\HttperCommand.cs" />
     <Compile Include="Command\Commands\IfCommand.cs" />
-    <Compile Include="Command\Commands\ImageDownloadCommand.cs" />
     <Compile Include="Command\Commands\JsonCommand.cs" />
     <Compile Include="Command\Commands\ListCommand.cs" />
     <Compile Include="Command\Commands\RangCommand.cs" />
@@ -85,12 +80,9 @@
     <Compile Include="Command\Commands\ReplaceCommand.cs" />
     <Compile Include="Command\Commands\ResultCommand.cs" />
     <Compile Include="Command\Commands\SelectCommand.cs" />
-    <Compile Include="Command\Commands\TaskCommand.cs" />
     <Compile Include="Command\Commands\XPathCommand.cs" />
     <Compile Include="Command\ICommand.cs" />
-    <Compile Include="Command\Utilty.cs" />
     <Compile Include="Config\ConfigParser.cs" />
-    <Compile Include="Config\ConfigWriter.cs" />
     <Compile Include="Config\Model\Node.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

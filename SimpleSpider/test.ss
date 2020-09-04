@@ -1,7 +1,8 @@
 ﻿engine
-	data source=搜狐新闻
-	data tag=时政
-	data sceneId=1460
+	var source=搜狐新闻
+	var tag=时政
+	var sceneId=1460
+	var url=1
 	if url
 		range 1 3
 		include include.ss

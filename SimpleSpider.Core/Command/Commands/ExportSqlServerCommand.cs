@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
-using Dapper;
+﻿using Dapper;
 using SqlMeta.Data.Repositories;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 
 namespace SimpleSpider.Command.Commands
 {

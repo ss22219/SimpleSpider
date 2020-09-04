@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SimpleSpider.Command.Commands
 {
@@ -18,7 +14,7 @@ namespace SimpleSpider.Command.Commands
 
         public CommandResult Excute(object pipelineInput, Dictionary<string, string> data, string[] args)
         {
-            return new CommandResult() { Success = true, PipelineOutput = new string[] { "v0.1" }, Data = data };
+            return new CommandResult() { Success = true, PipelineOutput = new string[] { "v0.2" }, Data = data };
         }
     }
 }
